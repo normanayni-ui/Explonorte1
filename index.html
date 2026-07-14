@@ -92,6 +92,8 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 
 
 
+
+
 </head>
 <body>
 <div class="rz">
@@ -143,48 +145,48 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 <div class="crd-b">
 <div class="sec-t"><i class="fas fa-id-badge text-xs"></i> Datos Generales</div>
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
-<div><label class="lbl">N Report</label><input type="number" id="f-nReport" class="inp" placeholder="55"></div>
-<div><label class="lbl">Sector de Trabajo</label><select id="f-sector" class="inp"><option value="">Seleccionar sector...</option><option value="Taller">Taller</option><option value="Pozo">Pozo</option><option value="Rocas2">Rocas2</option><option value="Rocas3">Rocas3</option><option value="Santa Catalina">Santa Catalina</option><option value="Arenales">Arenales</option><option value="Dia-Explonorte">Dia-Explonorte</option></select></div>
-<div><label class="lbl">Fecha <span class="cref">(K5)</span></label><input type="date" id="f-fecha" class="inp"></div>
-<div><label class="lbl">Cumplio</label><div class="flex items-center gap-1"><select id="f-cumplio" class="inp" style="width:auto;min-width:70px" onchange="actCmp(this,'cI')"><option value="">---</option><option value="SI">SI</option><option value="NO">NO</option><option value="N/A">N/A</option></select><span id="cI" class="cmp-i"></span></div></div>
+<div><label class="lbl">N Report</label><input type="number" id="f-nReport" class="inp" placeholder="55" data-audio="Ingresa número de reporte" onfocus="hablar(this.dataset.audio)"></div>
+<div><label class="lbl">Sector de Trabajo</label><select id="f-sector" class="inp" data-audio="Selecciona el sector de trabajo" onfocus="hablar(this.dataset.audio)"><option value="">Seleccionar sector...</option><option value="Taller">Taller</option><option value="Pozo">Pozo</option><option value="Rocas2">Rocas2</option><option value="Rocas3">Rocas3</option><option value="Santa Catalina">Santa Catalina</option><option value="Arenales">Arenales</option><option value="Dia-Explonorte">Dia-Explonorte</option></select></div>
+<div><label class="lbl">Fecha <span class="cref">(K5)</span></label><input type="date" id="f-fecha" class="inp" data-audio="Selecciona la fecha" onfocus="hablar(this.dataset.audio)"></div>
+<div><label class="lbl">Cumplio</label><div class="flex items-center gap-1"><select id="f-cumplio" class="inp" style="width:auto;min-width:70px" onchange="actCmp(this,'cI')" data-audio="Selecciona si cumplió" onfocus="hablar(this.dataset.audio)"><option value="">---</option><option value="SI">SI</option><option value="NO">NO</option><option value="N/A">N/A</option></select><span id="cI" class="cmp-i"></span></div></div>
 </div>
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
-<div><label class="lbl">Persona a Cargo (Operador)</label><input type="text" id="f-operador" class="inp" placeholder="Nombre completo"></div>
-<div><label class="lbl">RUT</label><input type="text" id="f-rut" class="inp" placeholder="12345678-9"></div>
-<div><label class="lbl">Patente Maquinaria</label><select id="f-patente" class="inp" onchange="alCambiarPatente()"><option value="">Seleccionar patente...</option></select></div>
-<div><label class="lbl">Maquinaria que Utilizo</label><input type="text" id="f-maquinaria" class="inp inp-ro" readonly placeholder="Se autocompleta"></div>
+<div><label class="lbl">Persona a Cargo (Operador)</label><input type="text" id="f-operador" class="inp" placeholder="Nombre completo" data-audio="Ingresa el nombre del operador" onfocus="hablar(this.dataset.audio)"></div>
+<div><label class="lbl">RUT</label><input type="text" id="f-rut" class="inp" placeholder="12345678-9" data-audio="Ingresa tu Rut" onfocus="hablar(this.dataset.audio)"></div>
+<div><label class="lbl">Patente Maquinaria</label><select id="f-patente" class="inp" onchange="alCambiarPatente()" data-audio="Selecciona la patente de la maquinaria" onfocus="hablar(this.dataset.audio)"><option value="">Seleccionar patente...</option></select></div>
+<div><label class="lbl">Maquinaria que Utilizo</label><input type="text" id="f-maquinaria" class="inp inp-ro" readonly placeholder="Se autocompleta" data-audio="Maquinaria, se autocompleta" onfocus="hablar(this.dataset.audio)"></div>
 </div>
 <hr class="sdiv">
 <div class="sec-t"><i class="fas fa-clock text-xs"></i> Horas de Trabajo</div>
 <div class="grid grid-cols-3 gap-3 mb-3">
-<div><label class="lbl">Hora Inicio</label><input type="time" id="f-hInicio" class="inp" onchange="calcHT()"></div>
-<div><label class="lbl">Hora Finalizacion</label><input type="time" id="f-hFin" class="inp" onchange="calcHT()"></div>
-<div><label class="lbl">Horas Trabajadas</label><input type="text" id="f-hTrab" class="inp inp-ro" readonly></div>
+<div><label class="lbl">Hora Inicio</label><input type="time" id="f-hInicio" class="inp" onchange="calcHT()" data-audio="Ingresa hora de inicio" onfocus="hablar(this.dataset.audio)"></div>
+<div><label class="lbl">Hora Finalizacion</label><input type="time" id="f-hFin" class="inp" onchange="calcHT()" data-audio="Ingresa hora de finalización" onfocus="hablar(this.dataset.audio)"></div>
+<div><label class="lbl">Horas Trabajadas</label><input type="text" id="f-hTrab" class="inp inp-ro" readonly data-audio="Horas trabajadas, se calcula automáticamente" onfocus="hablar(this.dataset.audio)"></div>
 </div>
 <hr class="sdiv">
 <div class="sec-t"><i class="fas fa-gas-pump text-xs"></i> Control de Combustible</div>
 <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-3">
-<div><label class="lbl">Cargo Combustible?</label><div class="flex items-center gap-1"><select id="f-cargoComb" class="inp" style="width:auto;min-width:65px" onchange="actCmp(this,'cC');calcLH()"><option value="">---</option><option value="SI">SI</option><option value="NO">NO</option><option value="N/A">N/A</option></select><span id="cC" class="cmp-i"></span></div></div>
-<div><label class="lbl">Litros Cargados</label><input type="number" id="f-litros" class="inp" placeholder="0" step="0.1" min="0" oninput="calcLH()"></div>
-<div><label class="lbl">Lts/Hra</label><input type="text" id="f-ltsHra" class="inp inp-ro" readonly></div>
-<div><label class="lbl">Hora Carga</label><input type="time" id="f-hCarga" class="inp"></div>
-<div><label class="lbl">Fecha Carga</label><input type="date" id="f-fechaCarga" class="inp"></div>
+<div><label class="lbl">Cargo Combustible?</label><div class="flex items-center gap-1"><select id="f-cargoComb" class="inp" style="width:auto;min-width:65px" onchange="actCmp(this,'cC');calcLH()" data-audio="Selecciona si cargó combustible" onfocus="hablar(this.dataset.audio)"><option value="">---</option><option value="SI">SI</option><option value="NO">NO</option><option value="N/A">N/A</option></select><span id="cC" class="cmp-i"></span></div></div>
+<div><label class="lbl">Litros Cargados</label><input type="number" id="f-litros" class="inp" placeholder="0" step="0.1" min="0" oninput="calcLH()" data-audio="Ingresa los litros cargados" onfocus="hablar(this.dataset.audio)"></div>
+<div><label class="lbl">Lts/Hra</label><input type="text" id="f-ltsHra" class="inp inp-ro" readonly data-audio="Litros por hora, se calcula automáticamente" onfocus="hablar(this.dataset.audio)"></div>
+<div><label class="lbl">Hora Carga</label><input type="time" id="f-hCarga" class="inp" data-audio="Ingresa hora de carga de combustible" onfocus="hablar(this.dataset.audio)"></div>
+<div><label class="lbl">Fecha Carga</label><input type="date" id="f-fechaCarga" class="inp" data-audio="Ingresa fecha de carga de combustible" onfocus="hablar(this.dataset.audio)"></div>
 </div>
 <hr class="sdiv">
 <div class="sec-t"><i class="fas fa-tachometer-alt text-xs"></i> Horometro y Kilometraje</div>
 <div class="grid grid-cols-3 gap-3 mb-3">
-<div><label class="lbl">Horometro Inicio</label><input type="number" id="f-horIn" class="inp" placeholder="0" step="0.1" oninput="calcHM()"></div>
-<div><label class="lbl">Horometro Fin</label><input type="number" id="f-horFin" class="inp" placeholder="0" step="0.1" oninput="calcHM()"></div>
-<div><label class="lbl">Horas Maquina</label><input type="text" id="f-hMaq" class="inp inp-ro" readonly></div>
+<div><label class="lbl">Horometro Inicio</label><input type="number" id="f-horIn" class="inp" placeholder="0" step="0.1" oninput="calcHM()" data-audio="Ingresa horómetro inicial" onfocus="hablar(this.dataset.audio)"></div>
+<div><label class="lbl">Horometro Fin</label><input type="number" id="f-horFin" class="inp" placeholder="0" step="0.1" oninput="calcHM()" data-audio="Ingresa horómetro final" onfocus="hablar(this.dataset.audio)"></div>
+<div><label class="lbl">Horas Maquina</label><input type="text" id="f-hMaq" class="inp inp-ro" readonly data-audio="Horas máquina, se calcula automáticamente" onfocus="hablar(this.dataset.audio)"></div>
 </div>
 <div class="grid grid-cols-3 gap-3 mb-3">
-<div><label class="lbl">Kilometraje Inicial</label><input type="number" id="f-kmIn" class="inp" placeholder="0" step="1" oninput="calcKR()"></div>
-<div><label class="lbl">Kilometraje Final</label><input type="number" id="f-kmFin" class="inp" placeholder="0" step="1" oninput="calcKR()"></div>
-<div><label class="lbl">Km Recorridos</label><input type="text" id="f-kmRec" class="inp inp-ro" readonly></div>
+<div><label class="lbl">Kilometraje Inicial</label><input type="number" id="f-kmIn" class="inp" placeholder="0" step="1" oninput="calcKR()" data-audio="Ingresa kilometraje inicial" onfocus="hablar(this.dataset.audio)"></div>
+<div><label class="lbl">Kilometraje Final</label><input type="number" id="f-kmFin" class="inp" placeholder="0" step="1" oninput="calcKR()" data-audio="Ingresa kilometraje final" onfocus="hablar(this.dataset.audio)"></div>
+<div><label class="lbl">Km Recorridos</label><input type="text" id="f-kmRec" class="inp inp-ro" readonly data-audio="Kilómetros recorridos, se calcula automáticamente" onfocus="hablar(this.dataset.audio)"></div>
 </div>
 <hr class="sdiv">
 <div class="sec-t"><i class="fas fa-clipboard-list text-xs"></i> Actividad Realizada</div>
-<div class="mb-2"><label class="lbl">Detallo la tarea ejecutada y la ubicacion/sector</label><textarea id="f-actividad" class="inp" rows="3" placeholder="Describa la actividad realizada..."></textarea></div>
+<div class="mb-2"><label class="lbl">Detallo la tarea ejecutada y la ubicacion/sector</label><textarea id="f-actividad" class="inp" rows="3" placeholder="Describa la actividad realizada..." data-audio="Describe la actividad realizada" onfocus="hablar(this.dataset.audio)"></textarea></div>
 </div>
 </div>
 </section>
@@ -208,14 +210,14 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 <div class="sec-t"><i class="fas fa-info-circle text-xs"></i> Datos Generales</div>
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
 <div><label class="lbl">Fecha</label><input type="text" id="sup-fecha" class="inp inp-ro" readonly></div>
-<div><label class="lbl">Hora</label><input type="time" id="sup-hora" class="inp"F onchange="guardarSupEst()"></div>
-<div><label class="lbl">Nombre del Supervisor</label><input type="text" id="sup-nombre" class="inp" placeholder="Supervisor" onchange="guardarSupEst()"></div>
-<div><label class="lbl">RUT Supervisor</label><input type="text" id="sup-rut" class="inp" placeholder="RUT" onchange="guardarSupEst()"></div>
+<div><label class="lbl">Hora</label><input type="time" id="sup-hora" class="inp" onchange="guardarSupEst()" data-audio="Ingresa la hora" onfocus="hablar(this.dataset.audio)"></div>
+<div><label class="lbl">Nombre del Supervisor</label><input type="text" id="sup-nombre" class="inp" placeholder="Supervisor" onchange="guardarSupEst()" data-audio="Ingresa nombre del supervisor" onfocus="hablar(this.dataset.audio)"></div>
+<div><label class="lbl">RUT Supervisor</label><input type="text" id="sup-rut" class="inp" placeholder="RUT" onchange="guardarSupEst()" data-audio="Ingresa Rut del supervisor" onfocus="hablar(this.dataset.audio)"></div>
 </div>
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
-<div><label class="lbl">Lugar de Control</label><input type="text" id="sup-lugar" class="inp" placeholder="Lugar" onchange="guardarSupEst()"></div>
-<div><label class="lbl">Codigo</label><input type="text" id="sup-codigo" class="inp" value="PR-SSO-08" onchange="guardarSupEst()"></div>
-<div><label class="lbl">Prod. Acum. Mes (m3)</label><input type="number" id="sup-prodAcum" class="inp" value="11000" step="1" onchange="guardarSupEst()"></div>
+<div><label class="lbl">Lugar de Control</label><input type="text" id="sup-lugar" class="inp" placeholder="Lugar" onchange="guardarSupEst()" data-audio="Ingresa lugar de control" onfocus="hablar(this.dataset.audio)"></div>
+<div><label class="lbl">Codigo</label><input type="text" id="sup-codigo" class="inp" value="PR-SSO-08" onchange="guardarSupEst()" data-audio="Ingresa el código" onfocus="hablar(this.dataset.audio)"></div>
+<div><label class="lbl">Prod. Acum. Mes (m3)</label><input type="number" id="sup-prodAcum" class="inp" value="11000" step="1" onchange="guardarSupEst()" data-audio="Ingresa producción acumulada del mes" onfocus="hablar(this.dataset.audio)"></div>
 <div><label class="lbl">Cant. Personal</label><input type="text" id="sup-cantPers" class="inp inp-ro" readonly></div>
 </div>
 <hr class="sdiv">
@@ -232,7 +234,7 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 <div class="stc"><div class="text-xs mb-1" style="color:var(--mt)">Total Vueltas</div><div class="text-lg font-extrabold" style="font-family:'JetBrains Mono',monospace" id="sVT">0</div></div>
 <div class="stc"><div class="text-xs mb-1" style="color:var(--mt)">Total m3</div><div class="text-lg font-extrabold" style="font-family:'JetBrains Mono',monospace" id="sM3T">0</div></div>
 <div class="stc"><div class="text-xs mb-1" style="color:var(--mt)">Prod. Acum. Mes</div><div class="text-lg font-extrabold" style="font-family:'JetBrains Mono',monospace" id="sAcum">11000</div></div>
-<div class="stc"><div class="text-xs mb-1" style="color:var(--mt)">Prod. del Dia (m3)</div><input type="number" id="sup-prodDia" class="inp" value="0" step="1" onchange="guardarSupEst()"></div>
+<div class="stc"><div class="text-xs mb-1" style="color:var(--mt)">Prod. del Dia (m3)</div><input type="number" id="sup-prodDia" class="inp" value="0" step="1" onchange="guardarSupEst()" data-audio="Ingresa producción del día" onfocus="hablar(this.dataset.audio)"></div>
 </div>
 <hr class="sdiv">
 <div class="sec-t"><i class="fas fa-chart-bar text-xs"></i> Cuadro Resumen Horas / Hombre</div>
@@ -287,41 +289,37 @@ var M3_POR_VUELTA=20;
 /* ================================================================
    MAPA DE CELDAS — PERSONAL
    ================================================================ */
-var CELL_MAP_PERS={
-  nR:'D5',sec:'H5',fec:'K5',cum:'K7',op:'D6',rut:'H6',pat:'H8',maq:'D8',
-  hI:'D9',hF:'F9',hT:'H9',cC:'D12',lit:'E12',lH:'I12',hCa:'D13',fCa:'H13',
-  hoI:'D16',hoF:'F16',hM:'H16',kmI:'D17',kmF:'F17',kmR:'H17',act:'D19'
-};
+var CELL_MAP_PERS={nR:'D5',sec:'H5',fec:'K5',cum:'K7',op:'D6',rut:'H6',pat:'H8',maq:'D8',hI:'D9',hF:'F9',hT:'H9',cC:'D12',lit:'E12',lH:'I12',hCa:'D13',fCa:'H13',hoI:'D16',hoF:'F16',hM:'H16',kmI:'D17',kmF:'F17',kmR:'H17',act:'D19'};
 
 /* ================================================================
    MAPA DE CELDAS — SUPERVISOR
    ================================================================ */
-var CELL_MAP_SUP={
-  dg:{fec:'C6',hora:'F6',nom:'K6',rut:'C7',lugar:'F7',cod:'E8',prodAcum:'O6',cantPers:'K7'},
-  tbl:{startRow:11,cols:{n:'A',nom:'B',nR:'C',rut:'D',maq:'F',pat:'G',hM:'H',comb:'I',hI:'J',hF:'K',hH:'L',prodR:'E',actR:'M',vuel:'N',m3:'O'}},
-  res:{cantPers:'C26',tHH:'F26',promH:'C27',tHM:'F27',tCB:'C28',tM3:'F28',tVT:'N23'},
-  evt:{startRow:32,cols:{hora:'A',desc:'B',acc:'H',resp:'M'}},
-  firmas:{supFirma:'E37',supLabel:'A37',jefeFirma:'G37',jefeLabel:'J37'}
-};
+var CELL_MAP_SUP={dg:{fec:'C6',hora:'F6',nom:'K6',rut:'C7',lugar:'F7',cod:'E8',prodAcum:'O6',cantPers:'K7'},tbl:{startRow:11,cols:{n:'A',nom:'B',nR:'C',rut:'D',maq:'E',pat:'F',hM:'G',comb:'H',hI:'I',hF:'J',hH:'K',prodR:'L',actR:'M',vuel:'N',m3:'O'}},res:{cantPers:'C23',tHH:'E23',promH:'G23',tHM:'C24',tCB:'E24',tM3:'G24',tVT:'I24'},evt:{startRow:28,cols:{hora:'A',desc:'B',acc:'C',resp:'D'}},firmas:{supFirma:'A32',supLabel:'A33',jefeFirma:'G32',jefeLabel:'G33'}};
 
 /* ================================================================
    ESTADO GLOBAL
    ================================================================ */
 var ST={inds:[],sup:{dg:{nom:'',rut:'',lug:'',acum:11000,cod:'PR-SSO-08'},dias:{}},nI:1,nD:1,curD:null,edId:null};
-var TPL_PERS=null;
-var TPL_SUP=null;
-var IS_ADMIN=false;
+var TPL_PERS=null;var TPL_SUP=null;var IS_ADMIN=false;
+
+/* ================================================================
+   FUNCION DE VOZ (Web Speech API)
+   Lee el texto del atributo data-audio al enfocar el campo
+   ================================================================ */
+function hablar(texto){
+  if(!texto||!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  var msg=new SpeechSynthesisUtterance(texto);
+  msg.lang='es-CL';
+  msg.rate=1.05;
+  window.speechSynthesis.speak(msg);
+}
 
 /* ================================================================
    PERSISTENCIA
    ================================================================ */
 function cargar(){
-  try{
-    var s=localStorage.getItem('exp_norte');
-    if(s){var p=JSON.parse(s);if(p.inds)ST.inds=p.inds;if(p.sup)ST.sup=p.sup;if(p.nI)ST.nI=p.nI;if(p.nD)ST.nD=p.nD;if(p.curD)ST.curD=p.curD;if(p.edId)ST.edId=p.edId;}
-    if(!ST.sup.dg)ST.sup.dg={nom:'',rut:'',lug:'',acum:11000,cod:'PR-SSO-08'};
-    if(!ST.sup.dias)ST.sup.dias={};
-  }catch(e){console.error('Error cargando:',e);}
+  try{var s=localStorage.getItem('exp_norte');if(s){var p=JSON.parse(s);if(p.inds)ST.inds=p.inds;if(p.sup)ST.sup=p.sup;if(p.nI)ST.nI=p.nI;if(p.nD)ST.nD=p.nD;if(p.curD)ST.curD=p.curD;if(p.edId)ST.edId=p.edId;}if(!ST.sup.dg)ST.sup.dg={nom:'',rut:'',lug:'',acum:11000,cod:'PR-SSO-08'};if(!ST.sup.dias)ST.sup.dias={};}catch(e){console.error('Error cargando:',e);}
   actSt();
   cargarTplDB('tpl_pers',function(b){if(b){TPL_PERS=b;document.getElementById('tplStatus').textContent='Plantilla cargada ('+formatBytes(b.byteLength)+')';document.getElementById('btnElimTpl').style.display='inline-flex';}});
   cargarTplDB('tpl_sup',function(b){if(b){TPL_SUP=b;document.getElementById('tplSupStatus').textContent='Plantilla cargada ('+formatBytes(b.byteLength)+')';document.getElementById('btnElimTplSup').style.display='inline-flex';}});
@@ -348,129 +346,44 @@ function eliminarPlantillaSup(){TPL_SUP=null;elimTplDB('tpl_sup',function(){docu
    ================================================================ */
 window.addEventListener('DOMContentLoaded',function(){
   cargar();initPat();renderSup();renderHist();
-  var d=ST.sup.dg;
-  document.getElementById('sup-nombre').value=d.nom||'';
-  document.getElementById('sup-rut').value=d.rut||'';
-  document.getElementById('sup-lugar').value=d.lug||'';
-  document.getElementById('sup-codigo').value=d.cod||'PR-SSO-08';
-  document.getElementById('sup-prodAcum').value=d.acum||11000;
+  var d=ST.sup.dg;document.getElementById('sup-nombre').value=d.nom||'';document.getElementById('sup-rut').value=d.rut||'';document.getElementById('sup-lugar').value=d.lug||'';document.getElementById('sup-codigo').value=d.cod||'PR-SSO-08';document.getElementById('sup-prodAcum').value=d.acum||11000;
 });
 
-function initPat(){
-  var sel=document.getElementById('f-patente');
-  if(!sel)return;
-  sel.innerHTML='<option value="">Seleccionar patente...</option>';
-  Object.keys(MAQ).forEach(function(tipo){
-    var g=document.createElement('optgroup');g.label=tipo;
-    MAQ[tipo].forEach(function(p){var o=document.createElement('option');o.value=p;o.textContent=p;g.appendChild(o);});
-    sel.appendChild(g);
-  });
-}
-
-function alCambiarPatente(){
-  var p=document.getElementById('f-patente').value;
-  document.getElementById('f-maquinaria').value=(p&&P2M[p])?P2M[p]:'';
-}
+function initPat(){var sel=document.getElementById('f-patente');if(!sel)return;sel.innerHTML='<option value="">Seleccionar patente...</option>';Object.keys(MAQ).forEach(function(tipo){var g=document.createElement('optgroup');g.label=tipo;MAQ[tipo].forEach(function(p){var o=document.createElement('option');o.value=p;o.textContent=p;g.appendChild(o);});sel.appendChild(g);});}
+function alCambiarPatente(){var p=document.getElementById('f-patente').value;document.getElementById('f-maquinaria').value=(p&&P2M[p])?P2M[p]:'';}
 
 /* ================================================================
    CALCULOS
    ================================================================ */
-function calcHT(){
-  var i=document.getElementById('f-hInicio').value;
-  var f=document.getElementById('f-hFin').value;
-  var o=document.getElementById('f-hTrab');
-  if(!i||!f){o.value='';o.setAttribute('data-d','0');calcLH();return;}
-  var p1=i.split(':'),p2=f.split(':');
-  var diff=(parseInt(p2[0])*60+parseInt(p2[1]))-(parseInt(p1[0])*60+parseInt(p1[1]));
-  if(diff<0)diff+=1440;
-  var h=Math.floor(diff/60),m=diff%60,dec=diff/60;
-  o.value=h+':'+String(m).padStart(2,'0')+' ('+dec.toFixed(2)+' hrs)';
-  o.setAttribute('data-d',String(dec));calcLH();
-}
-function calcLH(){
-  var l=parseFloat(document.getElementById('f-litros').value)||0;
-  var hm=parseFloat(document.getElementById('f-hMaq').getAttribute('data-d'))||0;
-  document.getElementById('f-ltsHra').value=hm>0?(l/hm).toFixed(2):'';
-}
-function calcHM(){
-  var i=parseFloat(document.getElementById('f-horIn').value);
-  var f=parseFloat(document.getElementById('f-horFin').value);
-  var o=document.getElementById('f-hMaq');
-  if(isNaN(i)||isNaN(f)){o.value='';o.setAttribute('data-d','0');calcLH();return;}
-  var d=Math.max(0,f-i);o.value=d.toFixed(1);o.setAttribute('data-d',String(d));calcLH();
-}
-function calcKR(){
-  var i=parseFloat(document.getElementById('f-kmIn').value);
-  var f=parseFloat(document.getElementById('f-kmFin').value);
-  var o=document.getElementById('f-kmRec');
-  if(isNaN(i)||isNaN(f)){o.value='';return;}
-  o.value=Math.max(0,f-i).toFixed(0);
-}
-function actCmp(sel,id){
-  var ind=document.getElementById(id),v=sel.value;
-  ind.className='cmp-i'+(v==='SI'?' cmp-si':v==='NO'?' cmp-no':v==='N/A'?' cmp-na':'');
-  ind.textContent=v==='SI'?'\u2713':v==='NO'?'\u2717':v==='N/A'?'\u2014':'';
-}
+function calcHT(){var i=document.getElementById('f-hInicio').value;var f=document.getElementById('f-hFin').value;var o=document.getElementById('f-hTrab');if(!i||!f){o.value='';o.setAttribute('data-d','0');calcLH();return;}var p1=i.split(':'),p2=f.split(':');var diff=(parseInt(p2[0])*60+parseInt(p2[1]))-(parseInt(p1[0])*60+parseInt(p1[1]));if(diff<0)diff+=1440;var h=Math.floor(diff/60),m=diff%60,dec=diff/60;o.value=h+':'+String(m).padStart(2,'0')+' ('+dec.toFixed(2)+' hrs)';o.setAttribute('data-d',String(dec));calcLH();}
+function calcLH(){var l=parseFloat(document.getElementById('f-litros').value)||0;var hm=parseFloat(document.getElementById('f-hMaq').getAttribute('data-d'))||0;document.getElementById('f-ltsHra').value=hm>0?(l/hm).toFixed(2):'';}
+function calcHM(){var i=parseFloat(document.getElementById('f-horIn').value);var f=parseFloat(document.getElementById('f-horFin').value);var o=document.getElementById('f-hMaq');if(isNaN(i)||isNaN(f)){o.value='';o.setAttribute('data-d','0');calcLH();return;}var d=Math.max(0,f-i);o.value=d.toFixed(1);o.setAttribute('data-d',String(d));calcLH();}
+function calcKR(){var i=parseFloat(document.getElementById('f-kmIn').value);var f=parseFloat(document.getElementById('f-kmFin').value);var o=document.getElementById('f-kmRec');if(isNaN(i)||isNaN(f)){o.value='';return;}o.value=Math.max(0,f-i).toFixed(0);}
+function actCmp(sel,id){var ind=document.getElementById(id),v=sel.value;ind.className='cmp-i'+(v==='SI'?' cmp-si':v==='NO'?' cmp-no':v==='N/A'?' cmp-na':'');ind.textContent=v==='SI'?'\u2713':v==='NO'?'\u2717':v==='N/A'?'\u2014':'';}
 
 /* ================================================================
    UTILIDADES
    ================================================================ */
 function fmtF(fec){if(!fec)return '';var p=fec.split('-');if(p.length!==3)return fec;return p[2]+'/'+p[1]+'/'+p[0];}
 function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
-function cambiarTab(tab){
-  var tabs=['personal','supervisor','historial'];
-  for(var i=0;i<tabs.length;i++){var el=document.getElementById('tab-'+tabs[i]);if(el)el.style.display=(tabs[i]===tab)?'block':'none';}
-  var btns=document.querySelectorAll('.tab-b');
-  for(var j=0;j<btns.length;j++){if(btns[j].getAttribute('data-t')===tab)btns[j].classList.add('act');else btns[j].classList.remove('act');}
-  if(tab==='supervisor')renderSup();
-  if(tab==='historial')renderHist();
-}
-
-function toast(msg,tipo){
-  var t=document.getElementById('tst');
-  t.className='tst-c tst-'+(tipo||'in');
-  t.innerHTML='<i class="fas fa-'+(tipo==='ok'?'check-circle':tipo==='er'?'times-circle':'info-circle')+'"></i> '+msg;
-  t.classList.add('vis');setTimeout(function(){t.classList.remove('vis');},2800);
-}
+function cambiarTab(tab){var tabs=['personal','supervisor','historial'];for(var i=0;i<tabs.length;i++){var el=document.getElementById('tab-'+tabs[i]);if(el)el.style.display=(tabs[i]===tab)?'block':'none';}var btns=document.querySelectorAll('.tab-b');for(var j=0;j<btns.length;j++){if(btns[j].getAttribute('data-t')===tab)btns[j].classList.add('act');else btns[j].classList.remove('act');}if(tab==='supervisor')renderSup();if(tab==='historial')renderHist();}
+function toast(msg,tipo){var t=document.getElementById('tst');t.className='tst-c tst-'+(tipo||'in');t.innerHTML='<i class="fas fa-'+(tipo==='ok'?'check-circle':tipo==='er'?'times-circle':'info-circle')+'"></i> '+msg;t.classList.add('vis');setTimeout(function(){t.classList.remove('vis');},2800);}
 
 /* ================================================================
    ADMIN
    ================================================================ */
-function toggleAdmin(){
-  if(IS_ADMIN){
-    IS_ADMIN=false;document.getElementById('btnAdmin').innerHTML='<i class="fas fa-lock"></i> Admin';
-    document.getElementById('adminBadge').classList.remove('vis');toast('Modo administracion desactivado','in');
-    if(ST.edId!==null)setFormLocked(true);
-  }else{
-    var m=document.getElementById('adminModal');if(m){document.getElementById('adminUser').value='';document.getElementById('adminPass').value='';m.classList.add('open');setTimeout(function(){document.getElementById('adminUser').focus();},150);}
-  }
-}
+function toggleAdmin(){if(IS_ADMIN){IS_ADMIN=false;document.getElementById('btnAdmin').innerHTML='<i class="fas fa-lock"></i> Admin';document.getElementById('adminBadge').classList.remove('vis');toast('Modo administracion desactivado','in');if(ST.edId!==null)setFormLocked(true);}else{var m=document.getElementById('adminModal');if(m){document.getElementById('adminUser').value='';document.getElementById('adminPass').value='';m.classList.add('open');setTimeout(function(){document.getElementById('adminUser').focus();},150);}}}
 function closeAdminModal(){var m=document.getElementById('adminModal');if(m)m.classList.remove('open');}
-function checkAdminCreds(){
-  var u=document.getElementById('adminUser').value;var p=document.getElementById('adminPass').value;
-  if(u==='Explo'&&p==='@Expl@26'){
-    IS_ADMIN=true;document.getElementById('btnAdmin').innerHTML='<i class="fas fa-lock-open"></i> Admin';
-    document.getElementById('adminBadge').classList.add('vis');toast('Modo administracion activado','ok');
-    if(ST.edId!==null)setFormLocked(false);closeAdminModal();
-  }else{toast('Credenciales incorrectas','er');}
-}
+function checkAdminCreds(){var u=document.getElementById('adminUser').value;var p=document.getElementById('adminPass').value;if(u==='Explo'&&p==='@Expl@26'){IS_ADMIN=true;document.getElementById('btnAdmin').innerHTML='<i class="fas fa-lock-open"></i> Admin';document.getElementById('adminBadge').classList.add('vis');toast('Modo administracion activado','ok');if(ST.edId!==null)setFormLocked(false);closeAdminModal();}else{toast('Credenciales incorrectas','er');}}
 
 /* ================================================================
-   BLOQUEO DE FORMULARIO
-   El boton Limpiar SIEMPRE permanece visible.
-   Solo se oculta el boton Guardar cuando esta bloqueado.
+   BLOQUEO DE FORMULARIO (Limpiar siempre visible)
    ================================================================ */
 function setFormLocked(locked){
   var ids=['f-nReport','f-sector','f-fecha','f-cumplio','f-operador','f-rut','f-patente','f-hInicio','f-hFin','f-cargoComb','f-litros','f-hCarga','f-fechaCarga','f-horIn','f-horFin','f-kmIn','f-kmFin','f-actividad'];
-  for(var i=0;i<ids.length;i++){
-    var el=document.getElementById(ids[i]);
-    if(el){if(locked){el.classList.add('inp-locked');el.disabled=true;}else{el.classList.remove('inp-locked');el.disabled=false;}}
-  }
-  var bG=document.getElementById('btnGuardar');
-  var bL=document.getElementById('btnLimpiar');
+  for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el){if(locked){el.classList.add('inp-locked');el.disabled=true;}else{el.classList.remove('inp-locked');el.disabled=false;}}}
+  var bG=document.getElementById('btnGuardar');var bL=document.getElementById('btnLimpiar');
   if(bG)bG.style.display=locked?'none':'inline-flex';
-  /* Limpiar siempre visible */
   if(bL)bL.style.display='inline-flex';
   if(locked&&ST.edId!==null)document.getElementById('shtLbl').textContent='SOLO LECTURA';
 }
@@ -478,148 +391,43 @@ function setFormLocked(locked){
 /* ================================================================
    FORMULARIO
    ================================================================ */
-function leerForm(){
-  return{nR:document.getElementById('f-nReport').value,sec:document.getElementById('f-sector').value,fec:document.getElementById('f-fecha').value,cum:document.getElementById('f-cumplio').value,op:document.getElementById('f-operador').value,rut:document.getElementById('f-rut').value,pat:document.getElementById('f-patente').value,maq:document.getElementById('f-maquinaria').value,hI:document.getElementById('f-hInicio').value,hF:document.getElementById('f-hFin').value,hT:document.getElementById('f-hTrab').value,hTD:parseFloat(document.getElementById('f-hTrab').getAttribute('data-d'))||0,cC:document.getElementById('f-cargoComb').value,lit:parseFloat(document.getElementById('f-litros').value)||0,lH:document.getElementById('f-ltsHra').value,hCa:document.getElementById('f-hCarga').value,fCa:document.getElementById('f-fechaCarga').value,hoI:document.getElementById('f-horIn').value,hoF:document.getElementById('f-horFin').value,hM:document.getElementById('f-hMaq').value,hMD:parseFloat(document.getElementById('f-hMaq').getAttribute('data-d'))||0,kmI:document.getElementById('f-kmIn').value,kmF:document.getElementById('f-kmFin').value,kmR:document.getElementById('f-kmRec').value,act:document.getElementById('f-actividad').value};
-}
+function leerForm(){return{nR:document.getElementById('f-nReport').value,sec:document.getElementById('f-sector').value,fec:document.getElementById('f-fecha').value,cum:document.getElementById('f-cumplio').value,op:document.getElementById('f-operador').value,rut:document.getElementById('f-rut').value,pat:document.getElementById('f-patente').value,maq:document.getElementById('f-maquinaria').value,hI:document.getElementById('f-hInicio').value,hF:document.getElementById('f-hFin').value,hT:document.getElementById('f-hTrab').value,hTD:parseFloat(document.getElementById('f-hTrab').getAttribute('data-d'))||0,cC:document.getElementById('f-cargoComb').value,lit:parseFloat(document.getElementById('f-litros').value)||0,lH:document.getElementById('f-ltsHra').value,hCa:document.getElementById('f-hCarga').value,fCa:document.getElementById('f-fechaCarga').value,hoI:document.getElementById('f-horIn').value,hoF:document.getElementById('f-horFin').value,hM:document.getElementById('f-hMaq').value,hMD:parseFloat(document.getElementById('f-hMaq').getAttribute('data-d'))||0,kmI:document.getElementById('f-kmIn').value,kmF:document.getElementById('f-kmFin').value,kmR:document.getElementById('f-kmRec').value,act:document.getElementById('f-actividad').value};}
 
 /* ================================================================
    GUARDAR / TRANSFERIR / LIMPIAR
    ================================================================ */
-function guardarPersonal(){
-  var d=leerForm();
-  if(!d.op.trim()){toast('Complete el nombre del operador','er');return;}
-  if(!d.fec){toast('Seleccione una fecha','er');return;}
-  if(ST.edId!==null){
-    var idx=-1;for(var i=0;i<ST.inds.length;i++){if(ST.inds[i].id===ST.edId){idx=i;break;}}
-    if(idx>=0){var old=ST.inds[idx];if(old.fec!==d.fec)quitarDeDia(old.fec,ST.edId);ST.inds[idx]=Object.assign({},d,{id:ST.edId,sn:old.sn});xferSup(d,ST.edId);ST.edId=null;document.getElementById('shtLbl').textContent='Nueva hoja';toast('Registro actualizado','ok');}
-  }else{d.id=Date.now();d.sn='individual'+ST.nI;ST.nI++;ST.inds.push(d);xferSup(d,d.id);toast('Guardado como '+d.sn+' — Transferido al Supervisor','ok');}
-  guardar();renderHist();limpiarForm();
-}
-
-function xferSup(d,indId){
-  var dk=d.fec;
-  if(!ST.sup.dias[dk]){ST.sup.dias[dk]={nom:'dia'+ST.nD,fec:dk,hor:'',filas:[],evts:[],pD:0};ST.nD++;if(!ST.curD)ST.curD=dk;}
-  var dia=ST.sup.dias[dk];var ei=-1;
-  for(var i=0;i<dia.filas.length;i++){if(dia.filas[i].iid===indId){ei=i;break;}}
-  var fl={iid:indId,nom:d.op,nR:d.nR,rut:d.rut,maq:d.maq,pat:d.pat,hM:d.hM,hMD:d.hMD,comb:d.lit,hI:d.hI,hF:d.hF,hH:d.hT,hHD:d.hTD,prodR:'',actR:d.act||'',vuel:2,m3:2*M3_POR_VUELTA};
-  if(ei>=0){fl.prodR=dia.filas[ei].prodR||'';fl.actR=dia.filas[ei].actR||d.act||'';fl.vuel=dia.filas[ei].vuel||2;fl.m3=fl.vuel*M3_POR_VUELTA;dia.filas[ei]=fl;}
-  else{dia.filas.push(fl);}
-  ST.curD=dk;guardar();renderSup();
-}
-
-function quitarDeDia(fec,id){
-  var dia=ST.sup.dias[fec];if(dia){var nf=[];for(var i=0;i<dia.filas.length;i++){if(dia.filas[i].iid!==id)nf.push(dia.filas[i]);}dia.filas=nf;if(dia.filas.length===0)delete ST.sup.dias[fec];}
-}
-
-function limpiarForm(){
-  var ids=['f-nReport','f-sector','f-fecha','f-operador','f-rut','f-hInicio','f-hFin','f-hTrab','f-litros','f-ltsHra','f-hCarga','f-fechaCarga','f-horIn','f-horFin','f-hMaq','f-kmIn','f-kmFin','f-kmRec','f-actividad'];
-  for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el){el.value='';if(el.getAttribute('data-d'))el.setAttribute('data-d','0');}}
-  document.getElementById('f-patente').value='';document.getElementById('f-maquinaria').value='';
-  document.getElementById('f-cumplio').value='';document.getElementById('f-cargoComb').value='';
-  var cmps=['cI','cC'];for(var j=0;j<cmps.length;j++){var ci=document.getElementById(cmps[j]);if(ci){ci.className='cmp-i';ci.textContent='';}}
-  ST.edId=null;document.getElementById('shtLbl').textContent='Nueva hoja';
-  setFormLocked(false);
-}
+function guardarPersonal(){var d=leerForm();if(!d.op.trim()){toast('Complete el nombre del operador','er');return;}if(!d.fec){toast('Seleccione una fecha','er');return;}if(ST.edId!==null){var idx=-1;for(var i=0;i<ST.inds.length;i++){if(ST.inds[i].id===ST.edId){idx=i;break;}}if(idx>=0){var old=ST.inds[idx];if(old.fec!==d.fec)quitarDeDia(old.fec,ST.edId);ST.inds[idx]=Object.assign({},d,{id:ST.edId,sn:old.sn});xferSup(d,ST.edId);ST.edId=null;document.getElementById('shtLbl').textContent='Nueva hoja';toast('Registro actualizado','ok');}}else{d.id=Date.now();d.sn='individual'+ST.nI;ST.nI++;ST.inds.push(d);xferSup(d,d.id);toast('Guardado como '+d.sn+' — Transferido al Supervisor','ok');}guardar();renderHist();limpiarForm();}
+function xferSup(d,indId){var dk=d.fec;if(!ST.sup.dias[dk]){ST.sup.dias[dk]={nom:'dia'+ST.nD,fec:dk,hor:'',filas:[],evts:[],pD:0};ST.nD++;if(!ST.curD)ST.curD=dk;}var dia=ST.sup.dias[dk];var ei=-1;for(var i=0;i<dia.filas.length;i++){if(dia.filas[i].iid===indId){ei=i;break;}}var fl={iid:indId,nom:d.op,nR:d.nR,rut:d.rut,maq:d.maq,pat:d.pat,hM:d.hM,hMD:d.hMD,comb:d.lit,hI:d.hI,hF:d.hF,hH:d.hT,hHD:d.hTD,prodR:'',actR:d.act||'',vuel:2,m3:2*M3_POR_VUELTA};if(ei>=0){fl.prodR=dia.filas[ei].prodR||'';fl.actR=dia.filas[ei].actR||d.act||'';fl.vuel=dia.filas[ei].vuel||2;fl.m3=fl.vuel*M3_POR_VUELTA;dia.filas[ei]=fl;}else{dia.filas.push(fl);}ST.curD=dk;guardar();renderSup();}
+function quitarDeDia(fec,id){var dia=ST.sup.dias[fec];if(dia){var nf=[];for(var i=0;i<dia.filas.length;i++){if(dia.filas[i].iid!==id)nf.push(dia.filas[i]);}dia.filas=nf;if(dia.filas.length===0)delete ST.sup.dias[fec];}}
+function limpiarForm(){var ids=['f-nReport','f-sector','f-fecha','f-operador','f-rut','f-hInicio','f-hFin','f-hTrab','f-litros','f-ltsHra','f-hCarga','f-fechaCarga','f-horIn','f-horFin','f-hMaq','f-kmIn','f-kmFin','f-kmRec','f-actividad'];for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el){el.value='';if(el.getAttribute('data-d'))el.setAttribute('data-d','0');}}document.getElementById('f-patente').value='';document.getElementById('f-maquinaria').value='';document.getElementById('f-cumplio').value='';document.getElementById('f-cargoComb').value='';var cmps=['cI','cC'];for(var j=0;j<cmps.length;j++){var ci=document.getElementById(cmps[j]);if(ci){ci.className='cmp-i';ci.textContent='';}}ST.edId=null;document.getElementById('shtLbl').textContent='Nueva hoja';setFormLocked(false);}
 
 /* ================================================================
    VISTA SUPERVISOR
    ================================================================ */
 function renderSup(){renderDayTabs();if(ST.curD&&ST.sup.dias[ST.curD]){renderSupTbl(ST.curD);}else{var dks=Object.keys(ST.sup.dias).sort();if(dks.length>0){ST.curD=dks[0];renderSupTbl(ST.curD);}else{limpiarSupV();}}}
-
-function limpiarSupV(){
-  document.getElementById('supBody').innerHTML='<tr><td colspan="15" class="text-center py-6" style="color:var(--mt)">Sin datos</td></tr>';
-  document.getElementById('sup-fecha').value='';document.getElementById('sup-cantPers').value='0';
-  document.getElementById('prodSec').style.display='none';
-  var ids=['sW','sHH','sPH','sHM','sCB','sM3','sVT','sM3T'];for(var i=0;i<ids.length;i++){document.getElementById(ids[i]).textContent='0';}
-  renderEvtTbl([]);
-}
-
-function renderDayTabs(){
-  var c=document.getElementById('dayTabs');var dks=Object.keys(ST.sup.dias).sort();
-  if(dks.length===0){c.innerHTML='<span class="text-xs" style="color:var(--mt)">Sin dias registrados</span>';return;}
-  var h='';for(var i=0;i<dks.length;i++){var dk=dks[i];var dia=ST.sup.dias[dk];h+='<button class="dyb'+(ST.curD===dk?' act':'')+'" onclick="selDia(\''+dk+'\')">'+dia.nom+' \u2014 '+fmtF(dk)+'</button>';}
-  h+='<button class="bt bt-d text-xs" onclick="elimDia()" style="margin-left:6px"><i class="fas fa-trash"></i></button>';c.innerHTML=h;
-}
-
+function limpiarSupV(){document.getElementById('supBody').innerHTML='<tr><td colspan="15" class="text-center py-6" style="color:var(--mt)">Sin datos</td></tr>';document.getElementById('sup-fecha').value='';document.getElementById('sup-cantPers').value='0';document.getElementById('prodSec').style.display='none';var ids=['sW','sHH','sPH','sHM','sCB','sM3','sVT','sM3T'];for(var i=0;i<ids.length;i++){document.getElementById(ids[i]).textContent='0';}renderEvtTbl([]);}
+function renderDayTabs(){var c=document.getElementById('dayTabs');var dks=Object.keys(ST.sup.dias).sort();if(dks.length===0){c.innerHTML='<span class="text-xs" style="color:var(--mt)">Sin dias registrados</span>';return;}var h='';for(var i=0;i<dks.length;i++){var dk=dks[i];var dia=ST.sup.dias[dk];h+='<button class="dyb'+(ST.curD===dk?' act':'')+'" onclick="selDia(\''+dk+'\')">'+dia.nom+' \u2014 '+fmtF(dk)+'</button>';}h+='<button class="bt bt-d text-xs" onclick="elimDia()" style="margin-left:6px"><i class="fas fa-trash"></i></button>';c.innerHTML=h;}
 function selDia(dk){ST.curD=dk;guardar();renderSup();}
 function elimDia(){if(!ST.curD)return;if(!confirm('Eliminar el dia?'))return;delete ST.sup.dias[ST.curD];var dks=Object.keys(ST.sup.dias).sort();ST.curD=dks.length>0?dks[0]:null;guardar();renderSup();toast('Dia eliminado','in');}
-
-function renderSupTbl(dk){
-  var dia=ST.sup.dias[dk];if(!dia){limpiarSupV();return;}
-  document.getElementById('sup-fecha').value=fmtF(dk);document.getElementById('sup-hora').value=dia.hor||'';
-  var dg=ST.sup.dg;
-  document.getElementById('sup-nombre').value=dg.nom||'';document.getElementById('sup-rut').value=dg.rut||'';
-  document.getElementById('sup-lugar').value=dg.lug||'';document.getElementById('sup-codigo').value=dg.cod||'PR-SSO-08';
-  document.getElementById('sup-prodAcum').value=dg.acum||11000;document.getElementById('sup-prodDia').value=dia.pD||0;
-  var body=document.getElementById('supBody');var rows=dia.filas;
-  if(rows.length===0){body.innerHTML='<tr><td colspan="15" class="text-center py-6" style="color:var(--mt)">Sin datos</td></tr>';document.getElementById('prodSec').style.display='none';actRes(0,0,0,0,0,0,0);renderEvtTbl(dia.evts||[]);return;}
-  document.getElementById('prodSec').style.display='grid';
-  var h='',mx=Math.max(rows.length,12);
-  for(var i=0;i<mx;i++){
-    var r=rows[i];
-    if(r){var cm3=(r.vuel||0)*M3_POR_VUELTA;h+='<tr><td>'+(i+1)+'</td><td>'+esc(r.nom)+'</td><td>'+esc(r.nR)+'</td><td>'+esc(r.rut)+'</td><td style="font-size:9px">'+esc(r.maq)+'</td><td style="font-size:9px">'+esc(r.pat)+'</td><td>'+esc(r.hM)+'</td><td>'+(r.comb||'')+'</td><td>'+r.hI+'</td><td>'+r.hF+'</td><td>'+esc(r.hH)+'</td><td><input type="text" class="ie ie-w" value="'+esc(r.prodR||'')+'" onchange="actFP(\''+dk+'\','+i+',\'prodR\',this.value)"></td><td><input type="text" class="ie ie-w" value="'+esc(r.actR||'')+'" onchange="actFP(\''+dk+'\','+i+',\'actR\',this.value)"></td><td><input type="number" class="ie" value="'+(r.vuel||0)+'" min="0" onchange="actVuel(\''+dk+'\','+i+',this.value)"></td><td style="color:var(--ac);font-weight:600;text-align:center">'+cm3+'</td></tr>';}
-    else{h+='<tr><td>'+(i+1)+'</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>0</td><td>0</td></tr>';}
-  }
-  body.innerHTML=h;
-  var tHH=0,tHM=0,tCB=0,tM3=0,tVT=0;
-  for(var j=0;j<rows.length;j++){tHH+=rows[j].hHD||0;tHM+=rows[j].hMD||0;tCB+=rows[j].comb||0;tVT+=rows[j].vuel||0;tM3+=(rows[j].vuel||0)*M3_POR_VUELTA;}
-  document.getElementById('sup-cantPers').value=rows.length;actRes(rows.length,tHH,tHM,tCB,tM3,tVT,dia.pD||0);renderEvtTbl(dia.evts||[]);
-}
-
+function renderSupTbl(dk){var dia=ST.sup.dias[dk];if(!dia){limpiarSupV();return;}document.getElementById('sup-fecha').value=fmtF(dk);document.getElementById('sup-hora').value=dia.hor||'';var dg=ST.sup.dg;document.getElementById('sup-nombre').value=dg.nom||'';document.getElementById('sup-rut').value=dg.rut||'';document.getElementById('sup-lugar').value=dg.lug||'';document.getElementById('sup-codigo').value=dg.cod||'PR-SSO-08';document.getElementById('sup-prodAcum').value=dg.acum||11000;document.getElementById('sup-prodDia').value=dia.pD||0;var body=document.getElementById('supBody');var rows=dia.filas;if(rows.length===0){body.innerHTML='<tr><td colspan="15" class="text-center py-6" style="color:var(--mt)">Sin datos</td></tr>';document.getElementById('prodSec').style.display='none';actRes(0,0,0,0,0,0,0);renderEvtTbl(dia.evts||[]);return;}document.getElementById('prodSec').style.display='grid';var h='',mx=Math.max(rows.length,12);for(var i=0;i<mx;i++){var r=rows[i];if(r){var cm3=(r.vuel||0)*M3_POR_VUELTA;h+='<tr><td>'+(i+1)+'</td><td>'+esc(r.nom)+'</td><td>'+esc(r.nR)+'</td><td>'+esc(r.rut)+'</td><td style="font-size:9px">'+esc(r.maq)+'</td><td style="font-size:9px">'+esc(r.pat)+'</td><td>'+esc(r.hM)+'</td><td>'+(r.comb||'')+'</td><td>'+r.hI+'</td><td>'+r.hF+'</td><td>'+esc(r.hH)+'</td><td><input type="text" class="ie ie-w" value="'+esc(r.prodR||'')+'" onchange="actFP(\''+dk+'\','+i+',\'prodR\',this.value)"></td><td><input type="text" class="ie ie-w" value="'+esc(r.actR||'')+'" onchange="actFP(\''+dk+'\','+i+',\'actR\',this.value)"></td><td><input type="number" class="ie" value="'+(r.vuel||0)+'" min="0" onchange="actVuel(\''+dk+'\','+i+',this.value)"></td><td style="color:var(--ac);font-weight:600;text-align:center">'+cm3+'</td></tr>';}else{h+='<tr><td>'+(i+1)+'</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>0</td><td>0</td></tr>';}}body.innerHTML=h;var tHH=0,tHM=0,tCB=0,tM3=0,tVT=0;for(var j=0;j<rows.length;j++){tHH+=rows[j].hHD||0;tHM+=rows[j].hMD||0;tCB+=rows[j].comb||0;tVT+=rows[j].vuel||0;tM3+=(rows[j].vuel||0)*M3_POR_VUELTA;}document.getElementById('sup-cantPers').value=rows.length;actRes(rows.length,tHH,tHM,tCB,tM3,tVT,dia.pD||0);renderEvtTbl(dia.evts||[]);}
 function actFP(dk,idx,campo,val){var dia=ST.sup.dias[dk];if(!dia||!dia.filas[idx])return;dia.filas[idx][campo]=val;guardar();}
 function actVuel(dk,idx,val){var dia=ST.sup.dias[dk];if(!dia||!dia.filas[idx])return;var v=parseInt(val)||0;dia.filas[idx].vuel=v;dia.filas[idx].m3=v*M3_POR_VUELTA;guardar();renderSupTbl(dk);}
-
-function actRes(cnt,tHH,tHM,tCB,tM3,tVT,pD){
-  document.getElementById('sW').textContent=cnt;document.getElementById('sHH').textContent=tHH.toFixed(2);
-  document.getElementById('sPH').textContent=cnt>0?(tHH/cnt).toFixed(2):'0.00';document.getElementById('sHM').textContent=tHM.toFixed(1);
-  document.getElementById('sCB').textContent=tCB.toFixed(0);document.getElementById('sM3').textContent=tM3.toFixed(0);
-  document.getElementById('sVT').textContent=tVT;document.getElementById('sM3T').textContent=tM3.toFixed(0);
-  document.getElementById('sAcum').textContent=parseInt(document.getElementById('sup-prodAcum').value)||11000;
-}
-
-function guardarSupEst(){
-  ST.sup.dg={nom:document.getElementById('sup-nombre').value,rut:document.getElementById('sup-rut').value,lug:document.getElementById('sup-lugar').value,cod:document.getElementById('sup-codigo').value,acum:parseInt(document.getElementById('sup-prodAcum').value)||11000};
-  if(ST.curD&&ST.sup.dias[ST.curD]){ST.sup.dias[ST.curD].hor=document.getElementById('sup-hora').value;ST.sup.dias[ST.curD].pD=parseFloat(document.getElementById('sup-prodDia').value)||0;}
-  guardar();toast('Supervisor guardado','ok');
-}
+function actRes(cnt,tHH,tHM,tCB,tM3,tVT,pD){document.getElementById('sW').textContent=cnt;document.getElementById('sHH').textContent=tHH.toFixed(2);document.getElementById('sPH').textContent=cnt>0?(tHH/cnt).toFixed(2):'0.00';document.getElementById('sHM').textContent=tHM.toFixed(1);document.getElementById('sCB').textContent=tCB.toFixed(0);document.getElementById('sM3').textContent=tM3.toFixed(0);document.getElementById('sVT').textContent=tVT;document.getElementById('sM3T').textContent=tM3.toFixed(0);document.getElementById('sAcum').textContent=parseInt(document.getElementById('sup-prodAcum').value)||11000;}
+function guardarSupEst(){ST.sup.dg={nom:document.getElementById('sup-nombre').value,rut:document.getElementById('sup-rut').value,lug:document.getElementById('sup-lugar').value,cod:document.getElementById('sup-codigo').value,acum:parseInt(document.getElementById('sup-prodAcum').value)||11000};if(ST.curD&&ST.sup.dias[ST.curD]){ST.sup.dias[ST.curD].hor=document.getElementById('sup-hora').value;ST.sup.dias[ST.curD].pD=parseFloat(document.getElementById('sup-prodDia').value)||0;}guardar();toast('Supervisor guardado','ok');}
 
 /* ================================================================
    EVENTOS / IMPREVISTOS
    ================================================================ */
 function agregarEvt(){if(!ST.curD||!ST.sup.dias[ST.curD])return;var dia=ST.sup.dias[ST.curD];if(!dia.evts)dia.evts=[];dia.evts.push({hor:'',desc:'',acc:'',resp:''});guardar();renderEvtTbl(dia.evts);}
-function renderEvtTbl(evts){
-  var body=document.getElementById('evtBody');if(!evts||evts.length===0){body.innerHTML='<tr><td colspan="5" class="text-center py-3" style="color:var(--mt)">Sin eventos</td></tr>';return;}
-  var h='';for(var i=0;i<evts.length;i++){var e=evts[i];h+='<tr><td><input type="time" class="ie" style="width:65px" value="'+(e.hor||'')+'" onchange="actEv('+i+',\'hor\',this.value)"></td><td><input type="text" class="ie ie-w" value="'+esc(e.desc||'')+'" onchange="actEv('+i+',\'desc\',this.value)"></td><td><input type="text" class="ie ie-w" value="'+esc(e.acc||'')+'" onchange="actEv('+i+',\'acc\',this.value)"></td><td><input type="text" class="ie" style="width:75px" value="'+esc(e.resp||'')+'" onchange="actEv('+i+',\'resp\',this.value)"></td><td><button class="bt bt-d" style="padding:2px 6px;font-size:10px" onclick="elimEv('+i+')"><i class="fas fa-times"></i></button></td></tr>';}body.innerHTML=h;
-}
+function renderEvtTbl(evts){var body=document.getElementById('evtBody');if(!evts||evts.length===0){body.innerHTML='<tr><td colspan="5" class="text-center py-3" style="color:var(--mt)">Sin eventos</td></tr>';return;}var h='';for(var i=0;i<evts.length;i++){var e=evts[i];h+='<tr><td><input type="time" class="ie" style="width:65px" value="'+(e.hor||'')+'" onchange="actEv('+i+',\'hor\',this.value)"></td><td><input type="text" class="ie ie-w" value="'+esc(e.desc||'')+'" onchange="actEv('+i+',\'desc\',this.value)"></td><td><input type="text" class="ie ie-w" value="'+esc(e.acc||'')+'" onchange="actEv('+i+',\'acc\',this.value)"></td><td><input type="text" class="ie" style="width:75px" value="'+esc(e.resp||'')+'" onchange="actEv('+i+',\'resp\',this.value)"></td><td><button class="bt bt-d" style="padding:2px 6px;font-size:10px" onclick="elimEv('+i+')"><i class="fas fa-times"></i></button></td></tr>';}body.innerHTML=h;}
 function actEv(idx,campo,val){if(!ST.curD||!ST.sup.dias[ST.curD])return;var dia=ST.sup.dias[ST.curD];if(!dia.evts||!dia.evts[idx])return;dia.evts[idx][campo]=val;guardar();}
 function elimEv(idx){if(!ST.curD||!ST.sup.dias[ST.curD])return;var dia=ST.sup.dias[ST.curD];if(!dia.evts)return;dia.evts.splice(idx,1);guardar();renderEvtTbl(dia.evts);}
 
 /* ================================================================
    HISTORIAL
    ================================================================ */
-function renderHist(){
-  var c=document.getElementById('histList');if(ST.inds.length===0){c.innerHTML='<div class="text-center py-8 col-span-full" style="color:var(--mt)">No hay registros guardados</div>';return;}
-  var h='',sorted=ST.inds.slice().sort(function(a,b){return(b.id||0)-(a.id||0);});
-  for(var i=0;i<sorted.length;i++){var r=sorted[i];h+='<div class="hcd" onclick="editInd('+(r.id||0)+')"><div class="flex items-center justify-between mb-2"><span class="text-xs font-bold" style="color:var(--ac)">'+esc(r.sn||'')+'</span><span class="text-xs" style="color:var(--mt)">'+fmtF(r.fec)+'</span></div><div class="text-sm font-bold mb-1">'+esc(r.op||'Sin nombre')+'</div><div class="text-xs" style="color:var(--mt)">'+esc(r.maq||'')+' \u2014 '+esc(r.pat||'')+'</div><div class="flex gap-1 mt-2"><button class="bt bt-s text-xs" onclick="event.stopPropagation();expIndExcel('+(r.id||0)+')"><i class="fas fa-file-excel"></i></button><button class="bt bt-d text-xs" onclick="event.stopPropagation();elimInd('+(r.id||0)+')"><i class="fas fa-trash"></i></button></div></div>';}c.innerHTML=h;
-}
-
-function editInd(id){
-  var r=null;for(var i=0;i<ST.inds.length;i++){if(ST.inds[i].id===id){r=ST.inds[i];break;}}if(!r)return;
-  ST.edId=id;
-  document.getElementById('f-nReport').value=r.nR||'';document.getElementById('f-sector').value=r.sec||'';document.getElementById('f-fecha').value=r.fec||'';
-  document.getElementById('f-cumplio').value=r.cum||'';actCmp(document.getElementById('f-cumplio'),'cI');
-  document.getElementById('f-operador').value=r.op||'';document.getElementById('f-rut').value=r.rut||'';document.getElementById('f-patente').value=r.pat||'';document.getElementById('f-maquinaria').value=r.maq||'';
-  document.getElementById('f-hInicio').value=r.hI||'';document.getElementById('f-hFin').value=r.hF||'';
-  var hTrab=document.getElementById('f-hTrab');hTrab.value=r.hT||'';hTrab.setAttribute('data-d',String(r.hTD||0));
-  document.getElementById('f-cargoComb').value=r.cC||'';actCmp(document.getElementById('f-cargoComb'),'cC');
-  document.getElementById('f-litros').value=r.lit||'';document.getElementById('f-ltsHra').value=r.lH||'';
-  document.getElementById('f-hCarga').value=r.hCa||'';document.getElementById('f-fechaCarga').value=r.fCa||'';
-  document.getElementById('f-horIn').value=r.hoI||'';document.getElementById('f-horFin').value=r.hoF||'';
-  var hMaq=document.getElementById('f-hMaq');hMaq.value=r.hM||'';hMaq.setAttribute('data-d',String(r.hMD||0));
-  document.getElementById('f-kmIn').value=r.kmI||'';document.getElementById('f-kmFin').value=r.kmF||'';document.getElementById('f-kmRec').value=r.kmR||'';document.getElementById('f-actividad').value=r.act||'';
-  document.getElementById('shtLbl').textContent=r.sn||'Editando';setFormLocked(true);cambiarTab('personal');toast('Registro cargado — Modo solo lectura','in');
-}
-
+function renderHist(){var c=document.getElementById('histList');if(ST.inds.length===0){c.innerHTML='<div class="text-center py-8 col-span-full" style="color:var(--mt)">No hay registros guardados</div>';return;}var h='',sorted=ST.inds.slice().sort(function(a,b){return(b.id||0)-(a.id||0);});for(var i=0;i<sorted.length;i++){var r=sorted[i];h+='<div class="hcd" onclick="editInd('+(r.id||0)+')"><div class="flex items-center justify-between mb-2"><span class="text-xs font-bold" style="color:var(--ac)">'+esc(r.sn||'')+'</span><span class="text-xs" style="color:var(--mt)">'+fmtF(r.fec)+'</span></div><div class="text-sm font-bold mb-1">'+esc(r.op||'Sin nombre')+'</div><div class="text-xs" style="color:var(--mt)">'+esc(r.maq||'')+' \u2014 '+esc(r.pat||'')+'</div><div class="flex gap-1 mt-2"><button class="bt bt-s text-xs" onclick="event.stopPropagation();expIndExcel('+(r.id||0)+')"><i class="fas fa-file-excel"></i></button><button class="bt bt-d text-xs" onclick="event.stopPropagation();elimInd('+(r.id||0)+')"><i class="fas fa-trash"></i></button></div></div>';}c.innerHTML=h;}
+function editInd(id){var r=null;for(var i=0;i<ST.inds.length;i++){if(ST.inds[i].id===id){r=ST.inds[i];break;}}if(!r)return;ST.edId=id;document.getElementById('f-nReport').value=r.nR||'';document.getElementById('f-sector').value=r.sec||'';document.getElementById('f-fecha').value=r.fec||'';document.getElementById('f-cumplio').value=r.cum||'';actCmp(document.getElementById('f-cumplio'),'cI');document.getElementById('f-operador').value=r.op||'';document.getElementById('f-rut').value=r.rut||'';document.getElementById('f-patente').value=r.pat||'';document.getElementById('f-maquinaria').value=r.maq||'';document.getElementById('f-hInicio').value=r.hI||'';document.getElementById('f-hFin').value=r.hF||'';var hTrab=document.getElementById('f-hTrab');hTrab.value=r.hT||'';hTrab.setAttribute('data-d',String(r.hTD||0));document.getElementById('f-cargoComb').value=r.cC||'';actCmp(document.getElementById('f-cargoComb'),'cC');document.getElementById('f-litros').value=r.lit||'';document.getElementById('f-ltsHra').value=r.lH||'';document.getElementById('f-hCarga').value=r.hCa||'';document.getElementById('f-fechaCarga').value=r.fCa||'';document.getElementById('f-horIn').value=r.hoI||'';document.getElementById('f-horFin').value=r.hoF||'';var hMaq=document.getElementById('f-hMaq');hMaq.value=r.hM||'';hMaq.setAttribute('data-d',String(r.hMD||0));document.getElementById('f-kmIn').value=r.kmI||'';document.getElementById('f-kmFin').value=r.kmF||'';document.getElementById('f-kmRec').value=r.kmR||'';document.getElementById('f-actividad').value=r.act||'';document.getElementById('shtLbl').textContent=r.sn||'Editando';setFormLocked(true);cambiarTab('personal');toast('Registro cargado — Modo solo lectura','in');}
 function elimInd(id){if(!confirm('Eliminar este registro?'))return;var idx=-1,r=null;for(var i=0;i<ST.inds.length;i++){if(ST.inds[i].id===id){idx=i;r=ST.inds[i];break;}}if(idx>=0){if(r)quitarDeDia(r.fec,id);ST.inds.splice(idx,1);if(ST.edId===id){ST.edId=null;limpiarForm();}guardar();renderHist();toast('Registro eliminado','in');}}
 
 /* ================================================================
@@ -635,83 +443,25 @@ function dlBlob(buf,nombre){var blob=new Blob([buf],{type:'application/vnd.openx
 /* ================================================================
    EXPORTAR PERSONAL A EXCEL
    ================================================================ */
-async function expPersExcel(){
-  var d=leerForm();if(!d.op.trim()){toast('Complete el nombre del operador','er');return;}
-  var wb=new ExcelJS.Workbook();var ws;
-  if(TPL_PERS){await wb.xlsx.load(TPL_PERS);ws=wb.worksheets[0];}
-  else{ws=wb.addWorksheet('Personal');ws.getColumn('D').width=16;ws.getColumn('H').width=16;ws.getColumn('K').width=14;}
-  var m=CELL_MAP_PERS;
-  sc(ws,m.nR,parseInt(d.nR)||'');sc(ws,m.sec,d.sec);sc(ws,m.fec,d.fec?fmtF(d.fec):'');sc(ws,m.cum,d.cum);
-  sc(ws,m.op,d.op);sc(ws,m.rut,d.rut);sc(ws,m.pat,d.pat);sc(ws,m.maq,d.maq);
-  sc(ws,m.hI,d.hI);sc(ws,m.hF,d.hF);sc(ws,m.hT,d.hT);sc(ws,m.cC,d.cC);
-  sc(ws,m.lit,d.lit);sc(ws,m.lH,d.lH);sc(ws,m.hCa,d.hCa);sc(ws,m.fCa,d.fCa?fmtF(d.fCa):'');
-  sc(ws,m.hoI,d.hoI?parseFloat(d.hoI):'');sc(ws,m.hoF,d.hoF?parseFloat(d.hoF):'');sc(ws,m.hM,d.hM);
-  sc(ws,m.kmI,d.kmI?parseInt(d.kmI):'');sc(ws,m.kmF,d.kmF?parseInt(d.kmF):'');sc(ws,m.kmR,d.kmR);sc(ws,m.act,d.act);
-  var buf=await wb.xlsx.writeBuffer();dlBlob(buf,'Personal_'+(d.op||'reg').replace(/\s+/g,'_')+'_'+(d.fec||'sf')+'.xlsx');toast('Excel Personal descargado','ok');
-}
-
-async function expIndExcel(id){
-  var r=null;for(var i=0;i<ST.inds.length;i++){if(ST.inds[i].id===id){r=ST.inds[i];break;}}if(!r)return;
-  var wb=new ExcelJS.Workbook();var ws;
-  if(TPL_PERS){await wb.xlsx.load(TPL_PERS);ws=wb.worksheets[0];}
-  else{ws=wb.addWorksheet('Personal');ws.getColumn('D').width=16;ws.getColumn('H').width=16;ws.getColumn('K').width=14;}
-  var m=CELL_MAP_PERS;
-  sc(ws,m.nR,parseInt(r.nR)||'');sc(ws,m.sec,r.sec);sc(ws,m.fec,r.fec?fmtF(r.fec):'');sc(ws,m.cum,r.cum);
-  sc(ws,m.op,r.op);sc(ws,m.rut,r.rut);sc(ws,m.pat,r.pat);sc(ws,m.maq,r.maq);
-  sc(ws,m.hI,r.hI);sc(ws,m.hF,r.hF);sc(ws,m.hT,r.hT);sc(ws,m.cC,r.cC);
-  sc(ws,m.lit,r.lit);sc(ws,m.lH,r.lH);sc(ws,m.hCa,r.hCa);sc(ws,m.fCa,r.fCa?fmtF(r.fCa):'');
-  sc(ws,m.hoI,r.hoI?parseFloat(r.hoI):'');sc(ws,m.hoF,r.hoF?parseFloat(r.hoF):'');sc(ws,m.hM,r.hM);
-  sc(ws,m.kmI,r.kmI?parseInt(r.kmI):'');sc(ws,m.kmF,r.kmF?parseInt(r.kmF):'');sc(ws,m.kmR,r.kmR);sc(ws,m.act,r.act);
-  var buf=await wb.xlsx.writeBuffer();dlBlob(buf,'Personal_'+(r.op||'reg').replace(/\s+/g,'_')+'_'+(r.fec||'sf')+'.xlsx');toast('Excel Personal descargado','ok');
-}
+async function expPersExcel(){var d=leerForm();if(!d.op.trim()){toast('Complete el nombre del operador','er');return;}var wb=new ExcelJS.Workbook();var ws;if(TPL_PERS){await wb.xlsx.load(TPL_PERS);ws=wb.worksheets[0];}else{ws=wb.addWorksheet('Personal');ws.getColumn('D').width=16;ws.getColumn('H').width=16;ws.getColumn('K').width=14;}var m=CELL_MAP_PERS;sc(ws,m.nR,parseInt(d.nR)||'');sc(ws,m.sec,d.sec);sc(ws,m.fec,d.fec?fmtF(d.fec):'');sc(ws,m.cum,d.cum);sc(ws,m.op,d.op);sc(ws,m.rut,d.rut);sc(ws,m.pat,d.pat);sc(ws,m.maq,d.maq);sc(ws,m.hI,d.hI);sc(ws,m.hF,d.hF);sc(ws,m.hT,d.hT);sc(ws,m.cC,d.cC);sc(ws,m.lit,d.lit);sc(ws,m.lH,d.lH);sc(ws,m.hCa,d.hCa);sc(ws,m.fCa,d.fCa?fmtF(d.fCa):'');sc(ws,m.hoI,d.hoI?parseFloat(d.hoI):'');sc(ws,m.hoF,d.hoF?parseFloat(d.hoF):'');sc(ws,m.hM,d.hM);sc(ws,m.kmI,d.kmI?parseInt(d.kmI):'');sc(ws,m.kmF,d.kmF?parseInt(d.kmF):'');sc(ws,m.kmR,d.kmR);sc(ws,m.act,d.act);var buf=await wb.xlsx.writeBuffer();dlBlob(buf,'Personal_'+(d.op||'reg').replace(/\s+/g,'_')+'_'+(d.fec||'sf')+'.xlsx');toast('Excel Personal descargado','ok');}
+async function expIndExcel(id){var r=null;for(var i=0;i<ST.inds.length;i++){if(ST.inds[i].id===id){r=ST.inds[i];break;}}if(!r)return;var wb=new ExcelJS.Workbook();var ws;if(TPL_PERS){await wb.xlsx.load(TPL_PERS);ws=wb.worksheets[0];}else{ws=wb.addWorksheet('Personal');ws.getColumn('D').width=16;ws.getColumn('H').width=16;ws.getColumn('K').width=14;}var m=CELL_MAP_PERS;sc(ws,m.nR,parseInt(r.nR)||'');sc(ws,m.sec,r.sec);sc(ws,m.fec,r.fec?fmtF(r.fec):'');sc(ws,m.cum,r.cum);sc(ws,m.op,r.op);sc(ws,m.rut,r.rut);sc(ws,m.pat,r.pat);sc(ws,m.maq,r.maq);sc(ws,m.hI,r.hI);sc(ws,m.hF,r.hF);sc(ws,m.hT,r.hT);sc(ws,m.cC,r.cC);sc(ws,m.lit,r.lit);sc(ws,m.lH,r.lH);sc(ws,m.hCa,r.hCa);sc(ws,m.fCa,r.fCa?fmtF(r.fCa):'');sc(ws,m.hoI,r.hoI?parseFloat(r.hoI):'');sc(ws,m.hoF,r.hoF?parseFloat(r.hoF):'');sc(ws,m.hM,r.hM);sc(ws,m.kmI,r.kmI?parseInt(r.kmI):'');sc(ws,m.kmF,r.kmF?parseInt(r.kmF):'');sc(ws,m.kmR,r.kmR);sc(ws,m.act,r.act);var buf=await wb.xlsx.writeBuffer();dlBlob(buf,'Personal_'+(r.op||'reg').replace(/\s+/g,'_')+'_'+(r.fec||'sf')+'.xlsx');toast('Excel Personal descargado','ok');}
 
 /* ================================================================
    EXPORTAR SUPERVISOR A EXCEL
    ================================================================ */
-async function expSupExcel(){
-  if(!ST.curD||!ST.sup.dias[ST.curD]){toast('No hay datos del supervisor para exportar','er');return;}
-  var dia=ST.sup.dias[ST.curD];var dg=ST.sup.dg;
-  var wb=new ExcelJS.Workbook();var ws;
-  if(TPL_SUP){await wb.xlsx.load(TPL_SUP);ws=wb.worksheets[0];}
-  else{ws=wb.addWorksheet('Supervisor');var cw={A:5,B:22,C:8,D:14,E:20,F:12,G:10,H:10,I:10,J:10,K:10,L:16,M:22,N:8,O:8};Object.keys(cw).forEach(function(c){ws.getColumn(c).width=cw[c];});var hdrs=['N','Nombre','NRep','RUT','Maquinaria','Patente','H.Maq','Comb(L)','H.Inicio','H.Fin','H.Hombre','Prod.Realizada','Actividad Realizada','Vueltas','m3'];var hCols=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O'];for(var hi=0;hi<hdrs.length;hi++){sc(ws,hCols[hi]+'10',hdrs[hi]);}}
-  var mg=CELL_MAP_SUP.dg;
-  sc(ws,mg.fec,dia.fec?fmtF(dia.fec):'');sc(ws,mg.hora,dia.hor||'');sc(ws,mg.nom,dg.nom||'');sc(ws,mg.rut,dg.rut||'');sc(ws,mg.lugar,dg.lug||'');sc(ws,mg.cod,dg.cod||'');sc(ws,mg.prodAcum,dg.acum||11000);sc(ws,mg.cantPers,dia.filas.length||0);
-  var mt=CELL_MAP_SUP.tbl;var sr=mt.startRow;var cols=mt.cols;var rows=dia.filas;
-  for(var i=0;i<rows.length;i++){var r=rows[i];var row=sr+i;sc(ws,cols.n+row,i+1);sc(ws,cols.nom+row,r.nom||'');sc(ws,cols.nR+row,r.nR||'');sc(ws,cols.rut+row,r.rut||'');sc(ws,cols.maq+row,r.maq||'');sc(ws,cols.pat+row,r.pat||'');sc(ws,cols.hM+row,r.hM||'');sc(ws,cols.comb+row,r.comb||0);sc(ws,cols.hI+row,r.hI||'');sc(ws,cols.hF+row,r.hF||'');sc(ws,cols.hH+row,r.hH||'');sc(ws,cols.prodR+row,r.prodR||'');sc(ws,cols.actR+row,r.actR||'');sc(ws,cols.vuel+row,r.vuel||0);sc(ws,cols.m3+row,(r.vuel||0)*M3_POR_VUELTA);}
-  var tHH=0,tHM=0,tCB=0,tM3=0,tVT=0;for(var j=0;j<rows.length;j++){tHH+=rows[j].hHD||0;tHM+=rows[j].hMD||0;tCB+=rows[j].comb||0;tVT+=rows[j].vuel||0;tM3+=(rows[j].vuel||0)*M3_POR_VUELTA;}
-  var mr=CELL_MAP_SUP.res;sc(ws,mr.cantPers,rows.length);sc(ws,mr.tHH,tHH.toFixed(2));sc(ws,mr.promH,rows.length>0?(tHH/rows.length).toFixed(2):'0.00');sc(ws,mr.tHM,tHM.toFixed(1));sc(ws,mr.tCB,tCB.toFixed(0));sc(ws,mr.tM3,tM3.toFixed(0));sc(ws,mr.tVT,tVT);
-  var me=CELL_MAP_SUP.evt;var evs=dia.evts||[];for(var ei=0;ei<evs.length;ei++){var ev=evs[ei];var erow=me.startRow+ei;sc(ws,me.cols.hora+erow,ev.hor||'');sc(ws,me.cols.desc+erow,ev.desc||'');sc(ws,me.cols.acc+erow,ev.acc||'');sc(ws,me.cols.resp+erow,ev.resp||'');}
-  var buf=await wb.xlsx.writeBuffer();dlBlob(buf,'Supervisor_'+fmtF(dia.fec).replace(/\//g,'-')+'.xlsx');toast('Excel Supervisor descargado','ok');
-}
+async function expSupExcel(){if(!ST.curD||!ST.sup.dias[ST.curD]){toast('No hay datos del supervisor para exportar','er');return;}var dia=ST.sup.dias[ST.curD];var dg=ST.sup.dg;var wb=new ExcelJS.Workbook();var ws;if(TPL_SUP){await wb.xlsx.load(TPL_SUP);ws=wb.worksheets[0];}else{ws=wb.addWorksheet('Supervisor');var cw={A:5,B:22,C:8,D:14,E:20,F:12,G:10,H:10,I:10,J:10,K:10,L:16,M:22,N:8,O:8};Object.keys(cw).forEach(function(c){ws.getColumn(c).width=cw[c];});var hdrs=['N','Nombre','NRep','RUT','Maquinaria','Patente','H.Maq','Comb(L)','H.Inicio','H.Fin','H.Hombre','Prod.Realizada','Actividad Realizada','Vueltas','m3'];var hCols=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O'];for(var hi=0;hi<hdrs.length;hi++){sc(ws,hCols[hi]+'10',hdrs[hi]);}}var mg=CELL_MAP_SUP.dg;sc(ws,mg.fec,dia.fec?fmtF(dia.fec):'');sc(ws,mg.hora,dia.hor||'');sc(ws,mg.nom,dg.nom||'');sc(ws,mg.rut,dg.rut||'');sc(ws,mg.lugar,dg.lug||'');sc(ws,mg.cod,dg.cod||'');sc(ws,mg.prodAcum,dg.acum||11000);sc(ws,mg.cantPers,dia.filas.length||0);var mt=CELL_MAP_SUP.tbl;var sr=mt.startRow;var cols=mt.cols;var rows=dia.filas;for(var i=0;i<rows.length;i++){var r=rows[i];var row=sr+i;sc(ws,cols.n+row,i+1);sc(ws,cols.nom+row,r.nom||'');sc(ws,cols.nR+row,r.nR||'');sc(ws,cols.rut+row,r.rut||'');sc(ws,cols.maq+row,r.maq||'');sc(ws,cols.pat+row,r.pat||'');sc(ws,cols.hM+row,r.hM||'');sc(ws,cols.comb+row,r.comb||0);sc(ws,cols.hI+row,r.hI||'');sc(ws,cols.hF+row,r.hF||'');sc(ws,cols.hH+row,r.hH||'');sc(ws,cols.prodR+row,r.prodR||'');sc(ws,cols.actR+row,r.actR||'');sc(ws,cols.vuel+row,r.vuel||0);sc(ws,cols.m3+row,(r.vuel||0)*M3_POR_VUELTA);}var tHH=0,tHM=0,tCB=0,tM3=0,tVT=0;for(var j=0;j<rows.length;j++){tHH+=rows[j].hHD||0;tHM+=rows[j].hMD||0;tCB+=rows[j].comb||0;tVT+=rows[j].vuel||0;tM3+=(rows[j].vuel||0)*M3_POR_VUELTA;}var mr=CELL_MAP_SUP.res;sc(ws,mr.cantPers,rows.length);sc(ws,mr.tHH,tHH.toFixed(2));sc(ws,mr.promH,rows.length>0?(tHH/rows.length).toFixed(2):'0.00');sc(ws,mr.tHM,tHM.toFixed(1));sc(ws,mr.tCB,tCB.toFixed(0));sc(ws,mr.tM3,tM3.toFixed(0));sc(ws,mr.tVT,tVT);var me=CELL_MAP_SUP.evt;var evs=dia.evts||[];for(var ei=0;ei<evs.length;ei++){var ev=evs[ei];var erow=me.startRow+ei;sc(ws,me.cols.hora+erow,ev.hor||'');sc(ws,me.cols.desc+erow,ev.desc||'');sc(ws,me.cols.acc+erow,ev.acc||'');sc(ws,me.cols.resp+erow,ev.resp||'');}var buf=await wb.xlsx.writeBuffer();dlBlob(buf,'Supervisor_'+fmtF(dia.fec).replace(/\//g,'-')+'.xlsx');toast('Excel Supervisor descargado','ok');}
 
 /* ================================================================
    EXPORTAR PERSONAL A PDF
    ================================================================ */
-function expPersPDF(){
-  var d=leerForm();if(!d.op.trim()){toast('Complete el nombre del operador','er');return;}
-  var jsPDF=window.jspdf.jsPDF;var doc=new jsPDF();
-  doc.setFontSize(16);doc.text('EXPLONORTE Chile SpA',14,18);doc.setFontSize(10);doc.text('Planilla de Trabajo de Personal',14,24);
-  var data=[['N Reporte',d.nR||''],['Sector',d.sec||''],['Fecha',d.fec?fmtF(d.fec):''],['Cumplio',d.cum||''],['Operador',d.op||''],['RUT',d.rut||''],['Patente',d.pat||''],['Maquinaria',d.maq||''],['Hora Inicio',d.hI||''],['Hora Fin',d.hF||''],['Horas Trabajadas',d.hT||''],['Cargo Combustible',d.cC||''],['Litros',d.lit||''],['Lts/Hra',d.lH||''],['Hora Carga',d.hCa||''],['Fecha Carga',d.fCa?fmtF(d.fCa):''],['Horometro Inicio',d.hoI||''],['Horometro Fin',d.hoF||''],['Horas Maquina',d.hM||''],['Km Inicial',d.kmI||''],['Km Final',d.kmF||''],['Km Recorridos',d.kmR||''],['Actividad',d.act||'']];
-  doc.autoTable({startY:30,head:[['Campo','Valor']],body:data,theme:'grid',headStyles:{fillColor:[212,148,10]},styles:{fontSize:8}});
-  doc.save('Personal_'+(d.op||'reg').replace(/\s+/g,'_')+'.pdf');toast('PDF Personal descargado','ok');
-}
+function expPersPDF(){var d=leerForm();if(!d.op.trim()){toast('Complete el nombre del operador','er');return;}var jsPDF=window.jspdf.jsPDF;var doc=new jsPDF();doc.setFontSize(16);doc.text('EXPLONORTE Chile SpA',14,18);doc.setFontSize(10);doc.text('Planilla de Trabajo de Personal',14,24);var data=[['N Reporte',d.nR||''],['Sector',d.sec||''],['Fecha',d.fec?fmtF(d.fec):''],['Cumplio',d.cum||''],['Operador',d.op||''],['RUT',d.rut||''],['Patente',d.pat||''],['Maquinaria',d.maq||''],['Hora Inicio',d.hI||''],['Hora Fin',d.hF||''],['Horas Trabajadas',d.hT||''],['Cargo Combustible',d.cC||''],['Litros',d.lit||''],['Lts/Hra',d.lH||''],['Hora Carga',d.hCa||''],['Fecha Carga',d.fCa?fmtF(d.fCa):''],['Horometro Inicio',d.hoI||''],['Horometro Fin',d.hoF||''],['Horas Maquina',d.hM||''],['Km Inicial',d.kmI||''],['Km Final',d.kmF||''],['Km Recorridos',d.kmR||''],['Actividad',d.act||'']];doc.autoTable({startY:30,head:[['Campo','Valor']],body:data,theme:'grid',headStyles:{fillColor:[212,148,10]},styles:{fontSize:8}});doc.save('Personal_'+(d.op||'reg').replace(/\s+/g,'_')+'.pdf');toast('PDF Personal descargado','ok');}
 
 /* ================================================================
    EXPORTAR SUPERVISOR A PDF
    ================================================================ */
-function expSupPDF(){
-  if(!ST.curD||!ST.sup.dias[ST.curD]){toast('No hay datos del supervisor','er');return;}
-  var dia=ST.sup.dias[ST.curD];var dg=ST.sup.dg;
-  var jsPDF=window.jspdf.jsPDF;var doc=new jsPDF({orientation:'landscape'});
-  doc.setFontSize(14);doc.text('EXPLONORTE Chile SpA — Planilla Supervisor',14,14);
-  doc.setFontSize(9);doc.text('Fecha: '+fmtF(dia.fec)+'  Hora: '+(dia.hor||'')+'  Supervisor: '+(dg.nom||'')+'  RUT: '+(dg.rut||'')+'  Lugar: '+(dg.lug||''),14,20);
-  var rows=dia.filas;var body=[];for(var i=0;i<rows.length;i++){var r=rows[i];body.push([i+1,r.nom||'',r.nR||'',r.rut||'',r.maq||'',r.pat||'',r.hM||'',r.comb||'',r.hI||'',r.hF||'',r.hH||'',r.prodR||'',r.actR||'',r.vuel||0,(r.vuel||0)*M3_POR_VUELTA]);}
-  doc.autoTable({startY:24,head:[['N','Nombre','NRep','RUT','Maquinaria','Patente','H.Maq','Comb','H.Ini','H.Fin','H.H','Prod.R','Actividad','Vueltas','m3']],body:body,theme:'grid',headStyles:{fillColor:[212,148,10],fontSize:6},styles:{fontSize:6,cellPadding:1}});
-  var y=doc.lastAutoTable.finalY+8;var tHH=0,tHM=0,tCB=0,tM3=0,tVT=0;for(var j=0;j<rows.length;j++){tHH+=rows[j].hHD||0;tHM+=rows[j].hMD||0;tCB+=rows[j].comb||0;tVT+=rows[j].vuel||0;tM3+=(rows[j].vuel||0)*M3_POR_VUELTA;}
-  doc.setFontSize(8);doc.text('Cant.Personal: '+rows.length+'  Total H.Hombre: '+tHH.toFixed(2)+'  Prom: '+(rows.length>0?(tHH/rows.length).toFixed(2):'0')+'  Total H.Maquina: '+tHM.toFixed(1)+'  Total Comb: '+tCB.toFixed(0)+'  Total m3: '+tM3.toFixed(0),14,y);
-  doc.save('Supervisor_'+fmtF(dia.fec).replace(/\//g,'-')+'.pdf');toast('PDF Supervisor descargado','ok');
-}
+function expSupPDF(){if(!ST.curD||!ST.sup.dias[ST.curD]){toast('No hay datos del supervisor','er');return;}var dia=ST.sup.dias[ST.curD];var dg=ST.sup.dg;var jsPDF=window.jspdf.jsPDF;var doc=new jsPDF({orientation:'landscape'});doc.setFontSize(14);doc.text('EXPLONORTE Chile SpA — Planilla Supervisor',14,14);doc.setFontSize(9);doc.text('Fecha: '+fmtF(dia.fec)+'  Hora: '+(dia.hor||'')+'  Supervisor: '+(dg.nom||'')+'  RUT: '+(dg.rut||'')+'  Lugar: '+(dg.lug||''),14,20);var rows=dia.filas;var body=[];for(var i=0;i<rows.length;i++){var r=rows[i];body.push([i+1,r.nom||'',r.nR||'',r.rut||'',r.maq||'',r.pat||'',r.hM||'',r.comb||'',r.hI||'',r.hF||'',r.hH||'',r.prodR||'',r.actR||'',r.vuel||0,(r.vuel||0)*M3_POR_VUELTA]);}doc.autoTable({startY:24,head:[['N','Nombre','NRep','RUT','Maquinaria','Patente','H.Maq','Comb','H.Ini','H.Fin','H.H','Prod.R','Actividad','Vueltas','m3']],body:body,theme:'grid',headStyles:{fillColor:[212,148,10],fontSize:6},styles:{fontSize:6,cellPadding:1}});var y=doc.lastAutoTable.finalY+8;var tHH=0,tHM=0,tCB=0,tM3=0,tVT=0;for(var j=0;j<rows.length;j++){tHH+=rows[j].hHD||0;tHM+=rows[j].hMD||0;tCB+=rows[j].comb||0;tVT+=rows[j].vuel||0;tM3+=(rows[j].vuel||0)*M3_POR_VUELTA;}doc.setFontSize(8);doc.text('Cant.Personal: '+rows.length+'  Total H.Hombre: '+tHH.toFixed(2)+'  Prom: '+(rows.length>0?(tHH/rows.length).toFixed(2):'0')+'  Total H.Maquina: '+tHM.toFixed(1)+'  Total Comb: '+tCB.toFixed(0)+'  Total m3: '+tM3.toFixed(0),14,y);doc.save('Supervisor_'+fmtF(dia.fec).replace(/\//g,'-')+'.pdf');toast('PDF Supervisor descargado','ok');}
 </script>
+
 
 
 <!-- Service Worker Registration -->
@@ -724,6 +474,7 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
+
 
 
 </body>
