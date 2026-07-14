@@ -1,0 +1,27 @@
+{
+  "name": "EXPLONORTE Chile SpA",
+  "short_name": "EXPLONORTE",
+  "description": "Sistema de Control de Personal y Maquinaria - Offline",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0C1017",
+  "theme_color": "#D4940A",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "prefer_related_applications": false
+}
