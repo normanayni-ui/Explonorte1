@@ -9,7 +9,6 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
-<!-- meSpeak.js: motor de voz 100% JavaScript, funciona SIN internet -->
 <script src="https://cdn.jsdelivr.net/npm/mespeak@2.0.2/mespeak.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -69,6 +68,8 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 .cmp-na{background:rgba(245,158,11,.2);border-color:#F59E0B;color:#F59E0B}
 .ovx{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .tpl-zone{background:rgba(168,85,247,.06);border:1px dashed rgba(168,85,247,.3);border-radius:10px;padding:12px;margin-bottom:10px}
+.import-zone{background:rgba(56,189,248,.06);border:2px dashed rgba(56,189,248,.3);border-radius:12px;padding:20px;text-align:center;transition:all .3s;cursor:pointer}
+.import-zone:hover,.import-zone.drag-over{background:rgba(56,189,248,.12);border-color:rgba(56,189,248,.5)}
 .admin-badge{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#22C55E;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;display:none}
 .admin-badge.vis{display:inline-block}
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center}
@@ -79,11 +80,16 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 .dot-p{width:7px;height:7px;border-radius:50%;background:var(--ok);animation:pls 2.5s ease-in-out infinite}
 @keyframes shm{0%{background-position:-200% 0}100%{background-position:200% 0}}
 .top-line{height:3px;background:linear-gradient(90deg,transparent,var(--ac),transparent);background-size:200% 100%;animation:shm 3s linear infinite}
-@media print{body{background:#fff!important;color:#000!important}body::before,body::after{display:none!important}.no-p{display:none!important}.crd{border:1px solid #bbb!important;background:#fff!important;break-inside:avoid}.crd-h{background:#f5f5f5!important;border-bottom:1px solid #bbb!important}.dtb thead th{background:#e5e5e5!important;color:#000!important;border:1px solid #ccc!important}.dtb tbody td{color:#000!important;border:1px solid #ddd!important}.inp-ro,.stc{background:#f0f0f0!important;color:#000!important;border:1px solid #ccc!important}.ie{border:1px solid #ccc!important;color:#000!important}.tpl-zone{display:none!important}}
+.import-file-item{background:var(--c2);border:1px solid var(--brd);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.import-file-item .file-icon{color:#38BDF8;font-size:16px}
+.import-file-item .file-name{flex:1;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.import-file-item .file-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.st-pending{background:rgba(56,189,248,.15);color:#38BDF8}
+.st-ok{background:rgba(34,197,94,.15);color:#22C55E}
+.st-er{background:rgba(239,68,68,.15);color:#EF4444}
+@media print{body{background:#fff!important;color:#000!important}body::before,body::after{display:none!important}.no-p{display:none!important}.crd{border:1px solid #bbb!important;background:#fff!important;break-inside:avoid}.crd-h{background:#f5f5f5!important;border-bottom:1px solid #bbb!important}.dtb thead th{background:#e5e5e5!important;color:#000!important;border:1px solid #ccc!important}.dtb tbody td{color:#000!important;border:1px solid #ddd!important}.inp-ro,.stc{background:#f0f0f0!important;color:#000!important;border:1px solid #ccc!important}.ie{border:1px solid #ccc!important;color:#000!important}.tpl-zone,.import-zone{display:none!important}}
 @media(max-width:640px){.tab-b{padding:8px 10px;font-size:11px}.crd-b{padding:10px}.bt{padding:6px 10px;font-size:11px}.dtb thead th{padding:4px 2px;font-size:7px}.dtb tbody td{padding:3px 2px;font-size:9px}.ie{width:40px;font-size:9px}.ie-w{width:65px}}
 </style>
-
-
 
 <!-- PWA: Manifest + Service Worker -->
 <link rel="manifest" href="manifest.json">
@@ -96,13 +102,13 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 
 
 
-
 </head>
 <body>
 <div class="rz">
 <div id="tst" class="tst-c"></div>
 <input type="file" id="tplFile" accept=".xlsx,.xls" style="display:none" onchange="cargarPlantilla(event)">
 <input type="file" id="tplSupFile" accept=".xlsx,.xls" style="display:none" onchange="cargarPlantillaSup(event)">
+<input type="file" id="importFiles" accept=".xlsx,.xls" multiple style="display:none" onchange="procesarImport(event)">
 <header class="no-p">
 <div class="top-line"></div>
 <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between flex-wrap gap-2">
@@ -127,13 +133,10 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 </div>
 </nav>
 <main class="max-w-7xl mx-auto px-4 py-4">
+
+<!-- =================== PERSONAL =================== -->
 <section id="tab-personal" class="anim-in">
-<div class="tpl-zone no-p mb-3">
-<div class="flex items-center justify-between flex-wrap gap-2">
-<div class="flex items-center gap-2"><i class="fas fa-file-upload" style="color:#A855F7"></i><span class="text-xs font-bold" style="color:#A855F7">PLANTILLA EXCEL ORIGINAL</span><span class="text-xs" style="color:var(--mt)" id="tplStatus">Sin plantilla cargada</span></div>
-<div class="flex gap-2"><button class="bt bt-w text-xs" onclick="document.getElementById('tplFile').click()"><i class="fas fa-upload"></i> Cargar Plantilla</button><button class="bt bt-s text-xs" onclick="eliminarPlantilla()" id="btnElimTpl" style="display:none"><i class="fas fa-times"></i> Quitar</button></div>
-</div>
-</div>
+<div class="tpl-zone no-p mb-3"><div class="flex items-center justify-between flex-wrap gap-2"><div class="flex items-center gap-2"><i class="fas fa-file-upload" style="color:#A855F7"></i><span class="text-xs font-bold" style="color:#A855F7">PLANTILLA EXCEL ORIGINAL</span><span class="text-xs" style="color:var(--mt)" id="tplStatus">Sin plantilla cargada</span></div><div class="flex gap-2"><button class="bt bt-w text-xs" onclick="document.getElementById('tplFile').click()"><i class="fas fa-upload"></i> Cargar Plantilla</button><button class="bt bt-s text-xs" onclick="eliminarPlantilla()" id="btnElimTpl" style="display:none"><i class="fas fa-times"></i> Quitar</button></div></div></div>
 <div class="flex flex-wrap gap-2 mb-3 no-p">
 <button class="bt bt-p" id="btnGuardar" onclick="guardarPersonal()"><i class="fas fa-save"></i> Guardar</button>
 <button class="bt bt-s" id="btnLimpiar" onclick="limpiarForm()"><i class="fas fa-eraser"></i> Limpiar</button>
@@ -192,9 +195,48 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 </div>
 </div>
 </section>
+
+<!-- =================== SUPERVISOR =================== -->
 <section id="tab-supervisor" class="anim-in" style="display:none">
+<!-- Login del Supervisor -->
+<div id="supLogin" class="flex items-center justify-center" style="min-height:60vh">
+<div style="background:var(--card);border:1px solid var(--brd);border-radius:16px;padding:32px;width:360px;max-width:90%">
+<div style="text-align:center;margin-bottom:20px">
+<div class="w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-3" style="background:linear-gradient(135deg,#38BDF8,#0284C7)"><i class="fas fa-users-cog text-white text-xl"></i></div>
+<h2 class="font-extrabold text-base mb-1">Acceso Supervisor</h2>
+<p class="text-xs" style="color:var(--mt)">Ingrese credenciales para acceder al modulo de supervision</p>
+</div>
+<div class="mb-3"><label class="lbl">Usuario</label><input type="text" id="supUser" class="inp" placeholder="Usuario" onkeydown="if(event.key==='Enter')checkSupLogin()"></div>
+<div class="mb-4"><label class="lbl">Contrasena</label><input type="password" id="supPass" class="inp" placeholder="Contrasena" onkeydown="if(event.key==='Enter')checkSupLogin()"></div>
+<button class="bt bt-p w-full justify-center" onclick="checkSupLogin()" style="padding:10px"><i class="fas fa-sign-in-alt"></i> Ingresar</button>
+</div>
+</div>
+<!-- Contenido del Supervisor (oculto hasta login) -->
+<div id="supContent" style="display:none">
 <div class="tpl-zone no-p mb-3"><div class="flex items-center justify-between flex-wrap gap-2"><div class="flex items-center gap-2"><i class="fas fa-file-upload" style="color:#A855F7"></i><span class="text-xs font-bold" style="color:#A855F7">PLANTILLA SUPERVISOR</span><span class="text-xs" style="color:var(--mt)" id="tplSupStatus">Sin plantilla cargada</span></div><div class="flex gap-2"><button class="bt bt-w text-xs" onclick="document.getElementById('tplSupFile').click()"><i class="fas fa-upload"></i> Cargar</button><button class="bt bt-s text-xs" onclick="eliminarPlantillaSup()" id="btnElimTplSup" style="display:none"><i class="fas fa-times"></i> Quitar</button></div></div></div>
-<div class="flex flex-wrap gap-2 mb-3 no-p"><button class="bt bt-p" onclick="guardarSupEst()"><i class="fas fa-save"></i> Guardar</button><span class="hidden sm:inline-block w-px self-stretch" style="background:var(--brd)"></span><button class="bt bt-g" onclick="expSupExcel()"><i class="fas fa-file-excel"></i> Excel</button><button class="bt bt-i" onclick="expSupPDF()"><i class="fas fa-file-pdf"></i> PDF</button><button class="bt bt-s" onclick="window.print()"><i class="fas fa-print"></i> Imprimir</button></div>
+<div class="flex flex-wrap gap-2 mb-3 no-p">
+<button class="bt bt-p" onclick="guardarSupEst()"><i class="fas fa-save"></i> Guardar</button>
+<button class="bt bt-d" onclick="cerrarSesionSup()"><i class="fas fa-sign-out-alt"></i> Cerrar Sesion</button>
+<span class="hidden sm:inline-block w-px self-stretch" style="background:var(--brd)"></span>
+<button class="bt bt-g" onclick="expSupExcel()"><i class="fas fa-file-excel"></i> Excel</button>
+<button class="bt bt-i" onclick="expSupPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
+<button class="bt bt-s" onclick="window.print()"><i class="fas fa-print"></i> Imprimir</button>
+</div>
+
+<!-- ZONA DE IMPORTACION DE PLANILLAS -->
+<div class="crd mb-3">
+<div class="crd-h flex items-center justify-between"><div><div class="sec-t" style="margin-bottom:0"><i class="fas fa-file-import text-xs"></i> Importar Planillas del Personal</div><p class="text-xs mt-1" style="color:var(--mt)">Cargue las planillas Excel exportadas por el personal para traspasar los datos automaticamente</p></div></div>
+<div class="crd-b">
+<div class="import-zone" id="importDropZone" onclick="document.getElementById('importFiles').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="event.preventDefault();this.classList.remove('drag-over');handleDrop(event)">
+<i class="fas fa-cloud-upload-alt text-3xl mb-2" style="color:#38BDF8"></i>
+<div class="text-sm font-bold mb-1" style="color:#38BDF8">Arrastre planillas aqui o haga clic para seleccionar</div>
+<div class="text-xs" style="color:var(--mt)">Acepta archivos .xlsx — Puede seleccionar multiples planillas a la vez</div>
+</div>
+<div id="importList" class="mt-3" style="display:none"></div>
+<div id="importSummary" class="mt-3" style="display:none"></div>
+</div>
+</div>
+
 <div class="crd">
 <div class="crd-h"><div><h2 class="font-bold text-sm">PLANILLA RESUMEN DE SUPERVISION DIARIA</h2><p class="text-xs mt-0.5" style="color:var(--mt)">EXPLONORTE Chile SpA — Personal y Maquinaria</p></div></div>
 <div class="crd-b">
@@ -220,7 +262,7 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 <div class="stc"><div class="text-xs mb-1" style="color:var(--mt)">Total Vueltas</div><div class="text-lg font-extrabold" style="font-family:'JetBrains Mono',monospace" id="sVT">0</div></div>
 <div class="stc"><div class="text-xs mb-1" style="color:var(--mt)">Total m3</div><div class="text-lg font-extrabold" style="font-family:'JetBrains Mono',monospace" id="sM3T">0</div></div>
 <div class="stc"><div class="text-xs mb-1" style="color:var(--mt)">Prod. Acum. Mes</div><div class="text-lg font-extrabold" style="font-family:'JetBrains Mono',monospace" id="sAcum">11000</div></div>
-<div class="stc"><div class="text-xs mb-1" style="color:var(--mt)">Prod. del Dia (m3)</div><input type="number" id="sup-prodDia" class="inp" value="0" step="1" onchange="guardarSupEst()" data-audio="Ingresa producción del día" data-tipo="input" onfocus="hablar(this.dataset.audio,this.dataset.tipo)"></div>
+<div class="stc"><div class="text-xs mb-1" style="color:var(--mt)">Prod. del Dia (m3)</div><input type="number" id="sup-prodDia" class="inp" value="0" step="1" onchange="guardarSupEst()"></div>
 </div>
 <hr class="sdiv">
 <div class="sec-t"><i class="fas fa-chart-bar text-xs"></i> Cuadro Resumen Horas / Hombre</div>
@@ -239,7 +281,9 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 <div class="grid grid-cols-2 gap-6 mt-4 pt-3" style="border-top:2px solid var(--brd)"><div class="text-center"><div style="border-bottom:2px solid var(--mt);color:var(--mt)" class="pb-1 mb-1">_________________________</div><div class="text-xs" style="color:var(--mt)">Firma Supervisor</div></div><div class="text-center"><div style="border-bottom:2px solid var(--mt);color:var(--mt)" class="pb-1 mb-1">_________________________</div><div class="text-xs" style="color:var(--mt)">Firma Jefe de Turno</div></div></div>
 </div>
 </div>
+</div>
 </section>
+
 <section id="tab-historial" class="anim-in" style="display:none">
 <div class="sec-t mb-4"><i class="fas fa-archive text-xs"></i> Registros Guardados</div>
 <div id="histList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"><div class="text-center py-8 col-span-full" style="color:var(--mt)">No hay registros guardados</div></div>
@@ -256,134 +300,26 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 </div>
 </div>
 <script>
-/* ================================================================
-   DATOS MAESTROS
-   ================================================================ */
 var MAQ={"SEMIREMOLQUE":["JF-9068","JH-6300","JH-9071","JL-4232","GRHC-73","JH-9145","JJ-5173","HXHF-16","HXHF-17","KYRX-20","JE-7855"],"TRACTO CAMION":["CBYC-23","CLWT-84","CSYH-21","DRHY-81","GTKL-20","DLPS-70"],"CAMION ALJIBE":["CGRC-25","CYJT-34","CSGD-13","WW70-55","BBBZ-91","CYRV-81","WR73-05","LRVR-88","LRVR-89"],"CAMION TOLVA":["BXCK-72","CLLZ-87","FBTS-90","FBTT-54","GSKL-54","JJYH-82","JJYH-83","WK63-10","PTGF-91","PTGF-95","RBKY-18","TDXR-11","TDXR-12","TDXR-13"],"CAMION TOLVA (Siniestrado)":["FBTS-91","FBTX-47"],"CAMION PETROLERO":["BYXD-23","PTRB-46"],"CAMION CARGO":["KVWS-48"],"CAMION PLANO":["CBXX-70","CTZH-10","TR-7337","WA-8513"],"CAMIONETA":["FSFS-42","KZPL-73","KTBL-54","PYXJ-11","GSKD-97","FBFD-44","ZH96-21","FCBF-59","FCRW-92","RKTK-52","RLPH-41"],"CAMIONETA (Robada)":["KZPL-74","KZPL-75"],"FURGON":["DLWL-90","LVTC-82","PCDT-77","XW70-83"],"BULLDOZER":["CZHV-28"],"EXCAVADORA":["DSSP-91","KVWW-96","DVDK-73","GFJG-95","DSSP-92","DVPW-82","SGTZ-76","TVFD-66"],"GRUA HORQUILLA":["FJGF-65"],"MINICARGADOR":["FBTV-11","FBTY-41"],"MOTONIVELADORA":["DPZZ-92","KVWS-54","PFSR-45"],"PERFORADORA":["DCR20 3211030","HCR 900-D 1211011","Y 00 9376 CY","180","HCR C180R"],"P SELECCIONADORA":["SIN PATENTE"],"CHANCADORA":["SIN PATENTE"],"RETROEXCAVADORA":["DWCJ-31","KVJW-15","LDWP-92"],"RODILLO HAMM":["FBTV-10"],"RODILLO SANY":["PLCZ-11"],"MARTILLO HIDRAULICO":["SERIE A 13O-002"],"CARGADOR FRONTAL":["TVFD-65","TBCG-65","PFSJ-24"]};
 var P2M={};Object.keys(MAQ).forEach(function(t){MAQ[t].forEach(function(p){P2M[p]=t;});});var M3_POR_VUELTA=20;
 var CELL_MAP_PERS={nR:'D5',sec:'H5',fec:'K5',cum:'K7',op:'D6',rut:'H6',pat:'H8',maq:'D8',hI:'D9',hF:'F9',hT:'H9',cC:'D12',lit:'E12',lH:'I12',hCa:'D13',fCa:'H13',hoI:'D16',hoF:'F16',hM:'H16',kmI:'D17',kmF:'F17',kmR:'H17',act:'D19'};
-var CELL_MAP_SUP={dg:{fec:'C6',hora:'F6',nom:'K6',rut:'C7',lugar:'F7',cod:'E8',prodAcum:'O6',cantPers:'K7'},tbl:{startRow:11,cols:{n:'A',nom:'B',nR:'C',rut:'D',maq:'E',pat:'F',hM:'G',comb:'H',hI:'I',hF:'J',hH:'K',prodR:'L',actR:'M',vuel:'N',m3:'O'}},res:{cantPers:'C23',tHH:'E23',promH:'G23',tHM:'C24',tCB:'E24',tM3:'G24',tVT:'I24'},evt:{startRow:28,cols:{hora:'A',desc:'B',acc:'C',resp:'D'}},firmas:{supFirma:'A32',supLabel:'A33',jefeFirma:'G32',jefeLabel:'G33'}};
+var CELL_MAP_SUP={dg:{fec:'C6',hora:'F6',nom:'K6',rut:'C7',lugar:'F7',cod:'E8',prodAcum:'O6',cantPers:'K7'},tbl:{startRow:11,cols:{n:'A',nom:'B',nR:'C',rut:'D',maq:'F',pat:'G',hM:'H',comb:'I',hI:'J',hF:'K',hH:'L',prodR:'E',actR:'M',vuel:'N',m3:'O'}},res:{cantPers:'C26',tHH:'F26',promH:'C27',tHM:'F27',tCB:'C28',tM3:'F28',tVT:'N23'},evt:{startRow:32,cols:{hora:'A',desc:'B',acc:'C',resp:'D'}},firmas:{supFirma:'E37',supLabel:'E38',jefeFirma:'J37',jefeLabel:'J38'}};
 var ST={inds:[],sup:{dg:{nom:'',rut:'',lug:'',acum:11000,cod:'PR-SSO-08'},dias:{}},nI:1,nD:1,curD:null,edId:null};
 var TPL_PERS=null;var TPL_SUP=null;var IS_ADMIN=false;
+var SUP_AUTH=false;
 
-/* ================================================================
-   SISTEMA DE VOZ — 4 NIVELES (FUNCIONA OFFLINE)
-   Nivel 1: speechSynthesis nativo (PC/navegador)
-   Nivel 2: meSpeak.js — motor JS puro, offline (APK)
-   Nivel 3: Google TTS via Audio (online)
-   Nivel 4: Tonos AudioContext (siempre offline)
-   ================================================================ */
-var _meSpeakReady=false;
-var _ttsAudio=null;
-var _audioUnlocked=false;
+/* ============ VOZ ============ */
+var _meSpeakReady=false;var _ttsAudio=null;var _audioUnlocked=false;
+function unlockAndroidAudio(){if(_audioUnlocked)return;try{var ac=new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();var buf=ac.createBuffer(1,1,22050);var src=ac.createBufferSource();src.buffer=buf;src.connect(ac.destination);src.start(0);src.stop(0);ac.close();_audioUnlocked=true;}catch(e){}}
+function initMeSpeak(){if(typeof meSpeak==='undefined'||_meSpeakReady)return;try{meSpeak.loadConfig('https://cdn.jsdelivr.net/npm/mespeak@2.0.2/mespeak_config.json');meSpeak.loadVoice('https://cdn.jsdelivr.net/npm/mespeak@2.0.2/voices/es.json',function(ok){if(ok)_meSpeakReady=true;});}catch(e){}}
+function hablar(texto,tipo){if(!texto)return;unlockAndroidAudio();if(window.speechSynthesis&&window.speechSynthesis.speak){try{window.speechSynthesis.cancel();var msg=new SpeechSynthesisUtterance(texto);msg.lang='es-ES';msg.rate=1.0;msg.volume=1.0;var voices=window.speechSynthesis.getVoices?window.speechSynthesis.getVoices():[];for(var i=0;i<voices.length;i++){if(voices[i].lang&&voices[i].lang.indexOf('es')===0){msg.voice=voices[i];break;}}msg.onerror=function(){_hablarFB(texto,tipo);};window.speechSynthesis.speak(msg);return;}catch(e){}}_hablarFB(texto,tipo);}
+function _hablarFB(texto,tipo){if(_meSpeakReady&&typeof meSpeak!=='undefined'){try{meSpeak.speak(texto,{voice:'es',speed:150,amplitude:100,pitch:50});return;}catch(e){}}if(_hablarGTTS(texto))return;_hablarTono(tipo||'input');}
+function _hablarGTTS(texto){try{if(_ttsAudio){_ttsAudio.pause();_ttsAudio.currentTime=0;_ttsAudio=null;}var audio=new Audio();_ttsAudio=audio;audio.src='https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=es&q='+encodeURIComponent(texto.substring(0,200));audio.volume=1.0;var p=audio.play();if(p&&p.catch)p.catch(function(){audio.load();setTimeout(function(){audio.play().catch(function(){});},100);});return true;}catch(e){return false;}}
+function _hablarTono(tipo){try{var ac=new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();var g=ac.createGain();g.connect(ac.destination);g.gain.value=0.25;var now=ac.currentTime;if(tipo==='input'){_tone(ac,g,now,523.25,0.08);_tone(ac,g,now+0.1,659.25,0.08);_tone(ac,g,now+0.2,783.99,0.12);}else if(tipo==='select'){_tone(ac,g,now,659.25,0.1);_tone(ac,g,now+0.13,783.99,0.12);}else if(tipo==='auto'){_tone(ac,g,now,261.63,0.25);}else{_tone(ac,g,now,880,0.06);_tone(ac,g,now+0.1,880,0.06);}}catch(e){}}
+function _tone(ac,gain,start,freq,dur){var o=ac.createOscillator();o.connect(gain);o.frequency.value=freq;o.type='sine';o.start(start);o.stop(start+dur);}
+document.addEventListener('touchstart',unlockAndroidAudio,{passive:true});document.addEventListener('touchend',unlockAndroidAudio,{passive:true});document.addEventListener('click',unlockAndroidAudio,{passive:true});
 
-/* Desbloquear audio Android */
-function unlockAndroidAudio(){
-  if(_audioUnlocked)return;
-  try{var ac=new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();var buf=ac.createBuffer(1,1,22050);var src=ac.createBufferSource();src.buffer=buf;src.connect(ac.destination);src.start(0);src.stop(0);ac.close();_audioUnlocked=true;}catch(e){}
-}
-
-/* Inicializar meSpeak.js para español */
-function initMeSpeak(){
-  if(typeof meSpeak==='undefined'||_meSpeakReady)return;
-  try{
-    meSpeak.loadConfig('https://cdn.jsdelivr.net/npm/mespeak@2.0.2/mespeak_config.json');
-    meSpeak.loadVoice('https://cdn.jsdelivr.net/npm/mespeak@2.0.2/voices/es.json',function(ok){
-      if(ok)_meSpeakReady=true;
-    });
-  }catch(e){}
-}
-
-/* Funcion principal — fallback de 4 niveles */
-function hablar(texto,tipo){
-  if(!texto)return;
-  unlockAndroidAudio();
-
-  /* === NIVEL 1: speechSynthesis nativo === */
-  if(window.speechSynthesis&&window.speechSynthesis.speak){
-    try{
-      window.speechSynthesis.cancel();
-      var msg=new SpeechSynthesisUtterance(texto);
-      msg.lang='es-ES';msg.rate=1.0;msg.volume=1.0;
-      var voices=window.speechSynthesis.getVoices?window.speechSynthesis.getVoices():[];
-      for(var i=0;i<voices.length;i++){if(voices[i].lang&&voices[i].lang.indexOf('es')===0){msg.voice=voices[i];break;}}
-      msg.onerror=function(){_hablarFallback(texto,tipo);};
-      window.speechSynthesis.speak(msg);
-      return;
-    }catch(e){}
-  }
-
-  _hablarFallback(texto,tipo);
-}
-
-function _hablarFallback(texto,tipo){
-  /* === NIVEL 2: meSpeak.js (OFFLINE — funciona sin internet) === */
-  if(_meSpeakReady&&typeof meSpeak!=='undefined'){
-    try{meSpeak.speak(texto,{voice:'es',speed:150,amplitude:100,pitch:50});return;}catch(e){}
-  }
-
-  /* === NIVEL 3: Google TTS via Audio (solo con internet) === */
-  if(_hablarGoogleTTS(texto))return;
-
-  /* === NIVEL 4: Tonos AudioContext (siempre offline,ultimo recurso) === */
-  _hablarTono(tipo||'input');
-}
-
-/* Google TTS — requiere internet */
-function _hablarGoogleTTS(texto){
-  try{
-    if(_ttsAudio){_ttsAudio.pause();_ttsAudio.currentTime=0;_ttsAudio=null;}
-    var audio=new Audio();_ttsAudio=audio;
-    audio.src='https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=es&q='+encodeURIComponent(texto.substring(0,200));
-    audio.volume=1.0;
-    var p=audio.play();
-    if(p&&p.catch)p.catch(function(){audio.load();setTimeout(function(){audio.play().catch(function(){});},100);});
-    return true;
-  }catch(e){return false;}
-}
-
-/* Tonos distintivos por tipo de campo — siempre funciona offline */
-function _hablarTono(tipo){
-  try{
-    var ac=new(window.AudioContext||window.webkitAudioContext)();
-    if(ac.state==='suspended')ac.resume();
-    var g=ac.createGain();g.connect(ac.destination);g.gain.value=0.25;
-    var now=ac.currentTime;
-
-    if(tipo==='input'){
-      /* 3 tonos ascendentes = campo de escritura */
-      _tone(ac,g,now,523.25,0.08);      /* C5 */
-      _tone(ac,g,now+0.1,659.25,0.08);  /* E5 */
-      _tone(ac,g,now+0.2,783.99,0.12);  /* G5 */
-    }else if(tipo==='select'){
-      /* 2 tonos medios = campo de seleccion */
-      _tone(ac,g,now,659.25,0.1);       /* E5 */
-      _tone(ac,g,now+0.13,783.99,0.12); /* G5 */
-    }else if(tipo==='auto'){
-      /* 1 tono largo grave = campo automatico */
-      _tone(ac,g,now,261.63,0.25);      /* C4 */
-    }else{
-      /* 2 beeps cortos = default */
-      _tone(ac,g,now,880,0.06);
-      _tone(ac,g,now+0.1,880,0.06);
-    }
-  }catch(e){}
-}
-
-function _tone(ac,gain,start,freq,dur){
-  var o=ac.createOscillator();o.connect(gain);
-  o.frequency.value=freq;o.type='sine';
-  o.start(start);o.stop(start+dur);
-}
-
-/* Desbloquear audio al primer toque */
-document.addEventListener('touchstart',unlockAndroidAudio,{passive:true});
-document.addEventListener('touchend',unlockAndroidAudio,{passive:true});
-document.addEventListener('click',unlockAndroidAudio,{passive:true});
-
-/* ================================================================
-   PERSISTENCIA
-   ================================================================ */
+/* ============ PERSISTENCIA ============ */
 function cargar(){try{var s=localStorage.getItem('exp_norte');if(s){var p=JSON.parse(s);if(p.inds)ST.inds=p.inds;if(p.sup)ST.sup=p.sup;if(p.nI)ST.nI=p.nI;if(p.nD)ST.nD=p.nD;if(p.curD)ST.curD=p.curD;if(p.edId)ST.edId=p.edId;}if(!ST.sup.dg)ST.sup.dg={nom:'',rut:'',lug:'',acum:11000,cod:'PR-SSO-08'};if(!ST.sup.dias)ST.sup.dias={};}catch(e){}actSt();cargarTplDB('tpl_pers',function(b){if(b){TPL_PERS=b;document.getElementById('tplStatus').textContent='Plantilla cargada ('+formatBytes(b.byteLength)+')';document.getElementById('btnElimTpl').style.display='inline-flex';}});cargarTplDB('tpl_sup',function(b){if(b){TPL_SUP=b;document.getElementById('tplSupStatus').textContent='Plantilla cargada ('+formatBytes(b.byteLength)+')';document.getElementById('btnElimTplSup').style.display='inline-flex';}});}
 function guardar(){try{localStorage.setItem('exp_norte',JSON.stringify(ST));}catch(e){}actSt();}
 function actSt(){var n=ST.inds.length;document.getElementById('stInfo').textContent=n+' registro'+(n!==1?'s':'');}
@@ -398,78 +334,284 @@ function cargarPlantillaSup(ev){var f=ev.target.files[0];if(!f)return;var reader
 function eliminarPlantilla(){TPL_PERS=null;elimTplDB('tpl_pers',function(){document.getElementById('tplStatus').textContent='Sin plantilla cargada';document.getElementById('btnElimTpl').style.display='none';toast('Plantilla eliminada','in');});}
 function eliminarPlantillaSup(){TPL_SUP=null;elimTplDB('tpl_sup',function(){document.getElementById('tplSupStatus').textContent='Sin plantilla cargada';document.getElementById('btnElimTplSup').style.display='none';toast('Plantilla eliminada','in');});}
 
-/* ================================================================
-   INICIO
-   ================================================================ */
-window.addEventListener('DOMContentLoaded',function(){
-  cargar();initPat();renderSup();renderHist();
-  var d=ST.sup.dg;document.getElementById('sup-nombre').value=d.nom||'';document.getElementById('sup-rut').value=d.rut||'';document.getElementById('sup-lugar').value=d.lug||'';document.getElementById('sup-codigo').value=d.cod||'PR-SSO-08';document.getElementById('sup-prodAcum').value=d.acum||11000;
-  /* Inicializar meSpeak para offline */
-  setTimeout(initMeSpeak,800);
-  setTimeout(initMeSpeak,3000);
-});
+/* ============ INICIO ============ */
+window.addEventListener('DOMContentLoaded',function(){cargar();initPat();renderSup();renderHist();var d=ST.sup.dg;document.getElementById('sup-nombre').value=d.nom||'';document.getElementById('sup-rut').value=d.rut||'';document.getElementById('sup-lugar').value=d.lug||'';document.getElementById('sup-codigo').value=d.cod||'PR-SSO-08';document.getElementById('sup-prodAcum').value=d.acum||11000;setTimeout(initMeSpeak,800);setTimeout(initMeSpeak,3000);});
 function initPat(){var sel=document.getElementById('f-patente');if(!sel)return;sel.innerHTML='<option value="">Seleccionar patente...</option>';Object.keys(MAQ).forEach(function(tipo){var g=document.createElement('optgroup');g.label=tipo;MAQ[tipo].forEach(function(p){var o=document.createElement('option');o.value=p;o.textContent=p;g.appendChild(o);});sel.appendChild(g);});}
 function alCambiarPatente(){var p=document.getElementById('f-patente').value;document.getElementById('f-maquinaria').value=(p&&P2M[p])?P2M[p]:'';}
 
-/* ================================================================
-   CALCULOS
-   ================================================================ */
-function calcHT(){var i=document.getElementById('f-hInicio').value;var f=document.getElementById('f-hFin').value;var o=document.getElementById('f-hTrab');if(!i||!f){o.value='';o.setAttribute('data-d','0');calcLH();return;}var p1=i.split(':'),p2=f.split(':');var diff=(parseInt(p2[0])*60+parseInt(p2[1]))-(parseInt(p1[0])*60+parseInt(p1[1]));if(diff<0)diff+=1440;var h=Math.floor(diff/60),m=diff%60,dec=diff/60;o.value=h+':'+String(m).padStart(2,'0')+' ('+dec.toFixed(2)+' hrs)';o.setAttribute('data-d',String(dec));calcLH();}
+/* ============ CALCULOS ============ */
+
+
+function calcHT(){
+  var i=document.getElementById('f-hInicio').value;
+  var f=document.getElementById('f-hFin').value;
+  var o=document.getElementById('f-hTrab');
+  if(!i||!f){o.value='';o.setAttribute('data-d','0');calcLH();return;}
+  var p1=i.split(':'),p2=f.split(':');
+  var diff=(parseInt(p2[0])*60+parseInt(p2[1]))-(parseInt(p1[0])*60+parseInt(p1[1]));
+  if(diff<0)diff+=1440;
+  var h=Math.floor(diff/60),m=diff%60,dec=diff/60;
+  /* Formato visible: solo HH:MM */
+  o.value=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+  /* Valor decimal oculto para calculos internos */
+  o.setAttribute('data-d',String(dec));
+  calcLH();
+}
+
 function calcLH(){var l=parseFloat(document.getElementById('f-litros').value)||0;var hm=parseFloat(document.getElementById('f-hMaq').getAttribute('data-d'))||0;document.getElementById('f-ltsHra').value=hm>0?(l/hm).toFixed(2):'';}
 function calcHM(){var i=parseFloat(document.getElementById('f-horIn').value);var f=parseFloat(document.getElementById('f-horFin').value);var o=document.getElementById('f-hMaq');if(isNaN(i)||isNaN(f)){o.value='';o.setAttribute('data-d','0');calcLH();return;}var d=Math.max(0,f-i);o.value=d.toFixed(1);o.setAttribute('data-d',String(d));calcLH();}
 function calcKR(){var i=parseFloat(document.getElementById('f-kmIn').value);var f=parseFloat(document.getElementById('f-kmFin').value);var o=document.getElementById('f-kmRec');if(isNaN(i)||isNaN(f)){o.value='';return;}o.value=Math.max(0,f-i).toFixed(0);}
 function actCmp(sel,id){var ind=document.getElementById(id),v=sel.value;ind.className='cmp-i'+(v==='SI'?' cmp-si':v==='NO'?' cmp-no':v==='N/A'?' cmp-na':'');ind.textContent=v==='SI'?'\u2713':v==='NO'?'\u2717':v==='N/A'?'\u2014':'';}
 
-/* ================================================================
-   UTILIDADES
-   ================================================================ */
+/* ============ UTILIDADES ============ */
 function fmtF(fec){if(!fec)return '';var p=fec.split('-');if(p.length!==3)return fec;return p[2]+'/'+p[1]+'/'+p[0];}
 function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function cambiarTab(tab){var tabs=['personal','supervisor','historial'];for(var i=0;i<tabs.length;i++){var el=document.getElementById('tab-'+tabs[i]);if(el)el.style.display=(tabs[i]===tab)?'block':'none';}var btns=document.querySelectorAll('.tab-b');for(var j=0;j<btns.length;j++){if(btns[j].getAttribute('data-t')===tab)btns[j].classList.add('act');else btns[j].classList.remove('act');}if(tab==='supervisor')renderSup();if(tab==='historial')renderHist();}
+
+function cambiarTab(tab){
+  if(tab==='supervisor'&&!SUP_AUTH){
+    document.querySelectorAll('.tab-b').forEach(function(b){b.classList.remove('act');});
+    document.querySelector('[data-t="supervisor"]').classList.add('act');
+    ['personal','supervisor','historial'].forEach(function(t){document.getElementById('tab-'+t).style.display='none';});
+    document.getElementById('tab-supervisor').style.display='block';
+    document.getElementById('supLogin').style.display='flex';
+    document.getElementById('supContent').style.display='none';
+    setTimeout(function(){document.getElementById('supUser').focus();},150);
+    return;
+  }
+  ['personal','supervisor','historial'].forEach(function(t){var el=document.getElementById('tab-'+t);if(el)el.style.display=(t===tab)?'block':'none';});
+  document.querySelectorAll('.tab-b').forEach(function(b){if(b.getAttribute('data-t')===tab)b.classList.add('act');else b.classList.remove('act');});
+  if(tab==='supervisor'){document.getElementById('supLogin').style.display='none';document.getElementById('supContent').style.display='block';renderSup();}
+  if(tab==='historial')renderHist();
+}
+
 function toast(msg,tipo){var t=document.getElementById('tst');t.className='tst-c tst-'+(tipo||'in');t.innerHTML='<i class="fas fa-'+(tipo==='ok'?'check-circle':tipo==='er'?'times-circle':'info-circle')+'"></i> '+msg;t.classList.add('vis');setTimeout(function(){t.classList.remove('vis');},2800);}
 
-/* ================================================================
-   ADMIN
-   ================================================================ */
+/* ============ SUPERVISOR LOGIN ============ */
+function checkSupLogin(){
+  var u=document.getElementById('supUser').value;
+  var p=document.getElementById('supPass').value;
+  if(u==='sup'&&p==='@Sup@26'){
+    SUP_AUTH=true;
+    document.getElementById('supLogin').style.display='none';
+    document.getElementById('supContent').style.display='block';
+    toast('Acceso Supervisor concedido','ok');
+    renderSup();
+  }else{toast('Credenciales de Supervisor incorrectas','er');}
+}
+function cerrarSesionSup(){
+  SUP_AUTH=false;
+  document.getElementById('supUser').value='';
+  document.getElementById('supPass').value='';
+  document.getElementById('supLogin').style.display='flex';
+  document.getElementById('supContent').style.display='none';
+  toast('Sesion Supervisor cerrada','in');
+}
+
+/* ============ ADMIN ============ */
 function toggleAdmin(){if(IS_ADMIN){IS_ADMIN=false;document.getElementById('btnAdmin').innerHTML='<i class="fas fa-lock"></i> Admin';document.getElementById('adminBadge').classList.remove('vis');toast('Modo administracion desactivado','in');if(ST.edId!==null)setFormLocked(true);}else{var m=document.getElementById('adminModal');if(m){document.getElementById('adminUser').value='';document.getElementById('adminPass').value='';m.classList.add('open');setTimeout(function(){document.getElementById('adminUser').focus();},150);}}}
 function closeAdminModal(){var m=document.getElementById('adminModal');if(m)m.classList.remove('open');}
 function checkAdminCreds(){var u=document.getElementById('adminUser').value;var p=document.getElementById('adminPass').value;if(u==='Explo'&&p==='@Expl@26'){IS_ADMIN=true;document.getElementById('btnAdmin').innerHTML='<i class="fas fa-lock-open"></i> Admin';document.getElementById('adminBadge').classList.add('vis');toast('Modo administracion activado','ok');if(ST.edId!==null)setFormLocked(false);closeAdminModal();}else{toast('Credenciales incorrectas','er');}}
 function setFormLocked(locked){var ids=['f-nReport','f-sector','f-fecha','f-cumplio','f-operador','f-rut','f-patente','f-hInicio','f-hFin','f-cargoComb','f-litros','f-hCarga','f-fechaCarga','f-horIn','f-horFin','f-kmIn','f-kmFin','f-actividad'];for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el){if(locked){el.classList.add('inp-locked');el.disabled=true;}else{el.classList.remove('inp-locked');el.disabled=false;}}}var bG=document.getElementById('btnGuardar');var bL=document.getElementById('btnLimpiar');if(bG)bG.style.display=locked?'none':'inline-flex';if(bL)bL.style.display='inline-flex';if(locked&&ST.edId!==null)document.getElementById('shtLbl').textContent='SOLO LECTURA';}
 function leerForm(){return{nR:document.getElementById('f-nReport').value,sec:document.getElementById('f-sector').value,fec:document.getElementById('f-fecha').value,cum:document.getElementById('f-cumplio').value,op:document.getElementById('f-operador').value,rut:document.getElementById('f-rut').value,pat:document.getElementById('f-patente').value,maq:document.getElementById('f-maquinaria').value,hI:document.getElementById('f-hInicio').value,hF:document.getElementById('f-hFin').value,hT:document.getElementById('f-hTrab').value,hTD:parseFloat(document.getElementById('f-hTrab').getAttribute('data-d'))||0,cC:document.getElementById('f-cargoComb').value,lit:parseFloat(document.getElementById('f-litros').value)||0,lH:document.getElementById('f-ltsHra').value,hCa:document.getElementById('f-hCarga').value,fCa:document.getElementById('f-fechaCarga').value,hoI:document.getElementById('f-horIn').value,hoF:document.getElementById('f-horFin').value,hM:document.getElementById('f-hMaq').value,hMD:parseFloat(document.getElementById('f-hMaq').getAttribute('data-d'))||0,kmI:document.getElementById('f-kmIn').value,kmF:document.getElementById('f-kmFin').value,kmR:document.getElementById('f-kmRec').value,act:document.getElementById('f-actividad').value};}
 function guardarPersonal(){var d=leerForm();if(!d.op.trim()){toast('Complete el nombre del operador','er');return;}if(!d.fec){toast('Seleccione una fecha','er');return;}if(ST.edId!==null){var idx=-1;for(var i=0;i<ST.inds.length;i++){if(ST.inds[i].id===ST.edId){idx=i;break;}}if(idx>=0){var old=ST.inds[idx];if(old.fec!==d.fec)quitarDeDia(old.fec,ST.edId);ST.inds[idx]=Object.assign({},d,{id:ST.edId,sn:old.sn});xferSup(d,ST.edId);ST.edId=null;document.getElementById('shtLbl').textContent='Nueva hoja';toast('Registro actualizado','ok');}}else{d.id=Date.now();d.sn='individual'+ST.nI;ST.nI++;ST.inds.push(d);xferSup(d,d.id);toast('Guardado como '+d.sn+' — Transferido al Supervisor','ok');}guardar();renderHist();limpiarForm();}
-function xferSup(d,indId){var dk=d.fec;if(!ST.sup.dias[dk]){ST.sup.dias[dk]={nom:'dia'+ST.nD,fec:dk,hor:'',filas:[],evts:[],pD:0};ST.nD++;if(!ST.curD)ST.curD=dk;}var dia=ST.sup.dias[dk];var ei=-1;for(var i=0;i<dia.filas.length;i++){if(dia.filas[i].iid===indId){ei=i;break;}}var fl={iid:indId,nom:d.op,nR:d.nR,rut:d.rut,maq:d.maq,pat:d.pat,hM:d.hM,hMD:d.hMD,comb:d.lit,hI:d.hI,hF:d.hF,hH:d.hT,hHD:d.hTD,prodR:'',actR:d.act||'',vuel:2,m3:2*M3_POR_VUELTA};if(ei>=0){fl.prodR=dia.filas[ei].prodR||'';fl.actR=dia.filas[ei].actR||d.act||'';fl.vuel=dia.filas[ei].vuel||2;fl.m3=fl.vuel*M3_POR_VUELTA;dia.filas[ei]=fl;}else{dia.filas.push(fl);}ST.curD=dk;guardar();renderSup();}
+function xferSup(d,indId){var dk=d.fec;if(!ST.sup.dias[dk]){ST.sup.dias[dk]={nom:'dia'+ST.nD,fec:dk,hor:'',filas:[],evts:[],pD:0};ST.nD++;if(!ST.curD)ST.curD=dk;}var dia=ST.sup.dias[dk];var ei=-1;for(var i=0;i<dia.filas.length;i++){if(dia.filas[i].iid===indId){ei=i;break;}}var fl={iid:indId,nom:d.op,nR:d.nR,rut:d.rut,maq:d.maq,pat:d.pat,hM:d.hM,hMD:d.hMD,comb:d.lit,hI:d.hI,hF:d.hF,hH:d.hT,hHD:d.hTD,prodR:'',actR:d.act||'',vuel:2,m3:2*M3_POR_VUELTA};if(ei>=0){fl.prodR=dia.filas[ei].prodR||'';fl.actR=dia.filas[ei].actR||d.act||'';fl.vuel=dia.filas[ei].vuel||2;fl.m3=fl.vuel*M3_POR_VUELTA;dia.filas[ei]=fl;}else{dia.filas.push(fl);}ST.curD=dk;guardar();if(SUP_AUTH)renderSup();}
 function quitarDeDia(fec,id){var dia=ST.sup.dias[fec];if(dia){var nf=[];for(var i=0;i<dia.filas.length;i++){if(dia.filas[i].iid!==id)nf.push(dia.filas[i]);}dia.filas=nf;if(dia.filas.length===0)delete ST.sup.dias[fec];}}
 function limpiarForm(){var ids=['f-nReport','f-sector','f-fecha','f-operador','f-rut','f-hInicio','f-hFin','f-hTrab','f-litros','f-ltsHra','f-hCarga','f-fechaCarga','f-horIn','f-horFin','f-hMaq','f-kmIn','f-kmFin','f-kmRec','f-actividad'];for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el){el.value='';if(el.getAttribute('data-d'))el.setAttribute('data-d','0');}}document.getElementById('f-patente').value='';document.getElementById('f-maquinaria').value='';document.getElementById('f-cumplio').value='';document.getElementById('f-cargoComb').value='';['cI','cC'].forEach(function(id){var ci=document.getElementById(id);if(ci){ci.className='cmp-i';ci.textContent='';}});ST.edId=null;document.getElementById('shtLbl').textContent='Nueva hoja';setFormLocked(false);}
 
+/* ============ IMPORTAR PLANILLAS ============ */
+function handleDrop(ev){var files=ev.dataTransfer.files;if(files.length>0)procesarArchivosImport(files);}
+function procesarImport(ev){var files=ev.target.files;if(files.length>0)procesarArchivosImport(files);ev.target.value='';}
+
+async function procesarArchivosImport(files){
+  var lista=document.getElementById('importList');lista.style.display='block';lista.innerHTML='';
+  var totalOk=0,totalErr=0,totalRegs=0;
+  for(var f=0;f<files.length;f++){
+    var file=files[f];
+    var itemId='imp-'+f;
+    lista.innerHTML+='<div class="import-file-item" id="'+itemId+'"><i class="fas fa-file-excel file-icon"></i><span class="file-name">'+esc(file.name)+'</span><span class="file-status st-pending"><i class="fas fa-spinner fa-spin"></i> Procesando...</span></div>';
+  }
+  for(var f=0;f<files.length;f++){
+    var file=files[f];
+    var itemId='imp-'+f;
+    var item=document.getElementById(itemId);
+    try{
+      var data=await readFileAsync(file);
+      var wb=new ExcelJS.Workbook();
+      await wb.xlsx.load(data);
+      var ws=wb.worksheets[0];
+      if(!ws){item.querySelector('.file-status').className='file-status st-er';item.querySelector('.file-status').innerHTML='<i class="fas fa-times"></i> Sin hojas';totalErr++;continue;}
+      var rec=leerPlanillaExcel(ws);
+      if(!rec.op||!rec.op.trim()){item.querySelector('.file-status').className='file-status st-er';item.querySelector('.file-status').innerHTML='<i class="fas fa-times"></i> Sin operador';totalErr++;continue;}
+      if(!rec.fec){item.querySelector('.file-status').className='file-status st-er';item.querySelector('.file-status').innerHTML='<i class="fas fa-times"></i> Sin fecha';totalErr++;continue;}
+      rec.id=Date.now()+f;rec.sn='importado'+ST.nI;ST.nI++;ST.inds.push(rec);
+      xferSup(rec,rec.id);
+      totalOk++;totalRegs++;
+      item.querySelector('.file-status').className='file-status st-ok';item.querySelector('.file-status').innerHTML='<i class="fas fa-check"></i> OK — '+esc(rec.op)+' ('+fmtF(rec.fec)+')';
+    }catch(e){
+      totalErr++;
+      if(item)item.querySelector('.file-status').className='file-status st-er';if(item)item.querySelector('.file-status').innerHTML='<i class="fas fa-times"></i> Error';
+    }
+  }
+  guardar();renderHist();
+  var sum=document.getElementById('importSummary');sum.style.display='block';
+  sum.innerHTML='<div class="stc"><div class="flex items-center gap-2"><i class="fas fa-check-circle" style="color:var(--ok)"></i><span class="text-sm font-bold">'+totalOk+' planilla'+(totalOk!==1?'s':'')+' importada'+(totalOk!==1?'s':'')+'</span><span style="color:var(--mt)">—</span><span class="text-sm" style="color:var(--ac)">'+totalRegs+' registro'+(totalRegs!==1?'s':'')+' traspasado'+(totalRegs!==1?'s':'')+' al Supervisor</span>'+(totalErr>0?'<span style="color:var(--mt)">—</span><span class="text-sm" style="color:var(--er)">'+totalErr+' error'+(totalErr!==1?'s':'')+'</span>':'')+'</div></div>';
+  if(totalOk>0)toast(totalOk+' planilla'+(totalOk!==1?'s':'')+' importada'+(totalOk!==1?'s':'')+' correctamente','ok');
+}
+
+function readFileAsync(file){return new Promise(function(resolve,reject){var reader=new FileReader();reader.onload=function(e){resolve(e.target.result);};reader.onerror=reject;reader.readAsArrayBuffer(file);});}
+
+function leerPlanillaExcel(ws){
+  var m=CELL_MAP_PERS;
+  var raw={};
+  Object.keys(m).forEach(function(k){
+    try{raw[k]=ws.getCell(m[k]).value;}catch(e){raw[k]='';}
+  });
+  var fecStr=excelDateToStr(raw.fec);
+  var fCaStr=excelDateToStr(raw.fCa);
+  return{nR:raw.nR||'',sec:raw.sec||'',fec:fecStr,cum:raw.cum||'',op:raw.op||'',rut:raw.rut||'',pat:raw.pat||'',maq:raw.maq||'',hI:raw.hI||'',hF:raw.hF||'',hT:raw.hT||'',hTD:parseHrsDec(raw.hT),cC:raw.cC||'',lit:parseFloat(raw.lit)||0,lH:raw.lH||'',hCa:raw.hCa||'',fCa:fCaStr,hoI:raw.hoI||'',hoF:raw.hoF||'',hM:raw.hM||'',hMD:parseFloat(raw.hM)||0,kmI:raw.kmI||'',kmF:raw.kmF||'',kmR:raw.kmR||'',act:raw.act||''};
+}
+
+function excelDateToStr(val){
+  if(!val&&val!==0)return '';
+  if(typeof val==='number'){var d=new Date((val-25569)*86400000);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  var s=String(val).trim();
+  var p=s.split('/');if(p.length===3){if(p[0].length===4)return s;return p[2]+'-'+p[1].padStart(2,'0')+'-'+p[0].padStart(2,'0');}
+  return s;
+}
+
+function parseHrsDec(val){
+  if(!val)return 0;
+  if(typeof val==='number')return val;
+  var s=String(val);var m=s.match(/[\d.]+/);return m?parseFloat(m[0]):0;
+}
+
+/* ============ VISTA SUPERVISOR ============ */
 function renderSup(){renderDayTabs();if(ST.curD&&ST.sup.dias[ST.curD]){renderSupTbl(ST.curD);}else{var dks=Object.keys(ST.sup.dias).sort();if(dks.length>0){ST.curD=dks[0];renderSupTbl(ST.curD);}else{limpiarSupV();}}}
-function limpiarSupV(){document.getElementById('supBody').innerHTML='<tr><td colspan="15" class="text-center py-6" style="color:var(--mt)">Sin datos</td></tr>';document.getElementById('sup-fecha').value='';document.getElementById('sup-cantPers').value='0';document.getElementById('prodSec').style.display='none';['sW','sHH','sPH','sHM','sCB','sM3','sVT','sM3T'].forEach(function(id){document.getElementById(id).textContent='0';});renderEvtTbl([]);}
+function limpiarSupV(){document.getElementById('supBody').innerHTML='<tr><td colspan="15" class="text-center py-6" style="color:var(--mt)">Sin datos — Importe planillas del personal o registre desde la pestana Personal</td></tr>';document.getElementById('sup-fecha').value='';document.getElementById('sup-cantPers').value='0';document.getElementById('prodSec').style.display='none';['sW','sHH','sPH','sHM','sCB','sM3','sVT','sM3T'].forEach(function(id){document.getElementById(id).textContent='0';});renderEvtTbl([]);}
 function renderDayTabs(){var c=document.getElementById('dayTabs');var dks=Object.keys(ST.sup.dias).sort();if(dks.length===0){c.innerHTML='<span class="text-xs" style="color:var(--mt)">Sin dias registrados</span>';return;}var h='';for(var i=0;i<dks.length;i++){var dk=dks[i];var dia=ST.sup.dias[dk];h+='<button class="dyb'+(ST.curD===dk?' act':'')+'" onclick="selDia(\''+dk+'\')">'+dia.nom+' \u2014 '+fmtF(dk)+'</button>';}h+='<button class="bt bt-d text-xs" onclick="elimDia()" style="margin-left:6px"><i class="fas fa-trash"></i></button>';c.innerHTML=h;}
 function selDia(dk){ST.curD=dk;guardar();renderSup();}
 function elimDia(){if(!ST.curD)return;if(!confirm('Eliminar el dia?'))return;delete ST.sup.dias[ST.curD];var dks=Object.keys(ST.sup.dias).sort();ST.curD=dks.length>0?dks[0]:null;guardar();renderSup();toast('Dia eliminado','in');}
-function renderSupTbl(dk){var dia=ST.sup.dias[dk];if(!dia){limpiarSupV();return;}document.getElementById('sup-fecha').value=fmtF(dk);document.getElementById('sup-hora').value=dia.hor||'';var dg=ST.sup.dg;document.getElementById('sup-nombre').value=dg.nom||'';document.getElementById('sup-rut').value=dg.rut||'';document.getElementById('sup-lugar').value=dg.lug||'';document.getElementById('sup-codigo').value=dg.cod||'PR-SSO-08';document.getElementById('sup-prodAcum').value=dg.acum||11000;document.getElementById('sup-prodDia').value=dia.pD||0;var body=document.getElementById('supBody');var rows=dia.filas;if(rows.length===0){body.innerHTML='<tr><td colspan="15" class="text-center py-6" style="color:var(--mt)">Sin datos</td></tr>';document.getElementById('prodSec').style.display='none';actRes(0,0,0,0,0,0,0);renderEvtTbl(dia.evts||[]);return;}document.getElementById('prodSec').style.display='grid';var h='',mx=Math.max(rows.length,12);for(var i=0;i<mx;i++){var r=rows[i];if(r){var cm3=(r.vuel||0)*M3_POR_VUELTA;h+='<tr><td>'+(i+1)+'</td><td>'+esc(r.nom)+'</td><td>'+esc(r.nR)+'</td><td>'+esc(r.rut)+'</td><td style="font-size:9px">'+esc(r.maq)+'</td><td style="font-size:9px">'+esc(r.pat)+'</td><td>'+esc(r.hM)+'</td><td>'+(r.comb||'')+'</td><td>'+r.hI+'</td><td>'+r.hF+'</td><td>'+esc(r.hH)+'</td><td><input type="text" class="ie ie-w" value="'+esc(r.prodR||'')+'" onchange="actFP(\''+dk+'\','+i+',\'prodR\',this.value)"></td><td><input type="text" class="ie ie-w" value="'+esc(r.actR||'')+'" onchange="actFP(\''+dk+'\','+i+',\'actR\',this.value)"></td><td><input type="number" class="ie" value="'+(r.vuel||0)+'" min="0" onchange="actVuel(\''+dk+'\','+i+',this.value)"></td><td style="color:var(--ac);font-weight:600;text-align:center">'+cm3+'</td></tr>';}else{h+='<tr><td>'+(i+1)+'</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>0</td><td>0</td></tr>';}}body.innerHTML=h;var tHH=0,tHM=0,tCB=0,tM3=0,tVT=0;for(var j=0;j<rows.length;j++){tHH+=rows[j].hHD||0;tHM+=rows[j].hMD||0;tCB+=rows[j].comb||0;tVT+=rows[j].vuel||0;tM3+=(rows[j].vuel||0)*M3_POR_VUELTA;}document.getElementById('sup-cantPers').value=rows.length;actRes(rows.length,tHH,tHM,tCB,tM3,tVT,dia.pD||0);renderEvtTbl(dia.evts||[]);}
+
+
+function renderSupTbl(dk){
+  var dia=ST.sup.dias[dk];if(!dia){limpiarSupV();return;}
+  document.getElementById('sup-fecha').value=fmtF(dk);document.getElementById('sup-hora').value=dia.hor||'';
+  var dg=ST.sup.dg;document.getElementById('sup-nombre').value=dg.nom||'';document.getElementById('sup-rut').value=dg.rut||'';
+  document.getElementById('sup-lugar').value=dg.lug||'';document.getElementById('sup-codigo').value=dg.cod||'PR-SSO-08';
+  document.getElementById('sup-prodAcum').value=dg.acum||11000;document.getElementById('sup-prodDia').value=dia.pD||0;
+  var body=document.getElementById('supBody');var rows=dia.filas;
+  if(rows.length===0){body.innerHTML='<tr><td colspan="15" class="text-center py-6" style="color:var(--mt)">Sin datos — Importe planillas del personal</td></tr>';document.getElementById('prodSec').style.display='none';actRes(0,0,0,0,0,0,0);renderEvtTbl(dia.evts||[]);return;}
+  document.getElementById('prodSec').style.display='grid';
+  var h='',mx=Math.max(rows.length,12);
+  for(var i=0;i<mx;i++){
+    var r=rows[i];
+    if(r){var cm3=(r.vuel||0)*M3_POR_VUELTA;h+='<tr><td>'+(i+1)+'</td><td>'+esc(r.nom)+'</td><td>'+esc(r.nR)+'</td><td>'+esc(r.rut)+'</td><td style="font-size:9px">'+esc(r.maq)+'</td><td style="font-size:9px">'+esc(r.pat)+'</td><td>'+esc(r.hM)+'</td><td>'+(r.comb||'')+'</td><td>'+r.hI+'</td><td>'+r.hF+'</td><td>'+esc(r.hH)+'</td><td><input type="text" class="ie ie-w" value="'+esc(r.prodR||'')+'" onchange="actFP(\''+dk+'\','+i+',\'prodR\',this.value)"></td><td><input type="text" class="ie ie-w" value="'+esc(r.actR||'')+'" onchange="actFP(\''+dk+'\','+i+',\'actR\',this.value)"></td><td><input type="number" class="ie" value="'+(r.vuel||0)+'" min="0" onchange="actVuel(\''+dk+'\','+i+',this.value)"></td><td style="color:var(--ac);font-weight:600;text-align:center">'+cm3+'</td></tr>';}
+    else{h+='<tr><td>'+(i+1)+'</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>0</td><td>0</td></tr>';}
+  }
+  body.innerHTML=h;
+  
+  /* Sumar minutos totales en lugar de decimales para evitar error de formato */
+  var totalMinHH=0,tHM=0,tCB=0,tM3=0,tVT=0;
+  for(var j=0;j<rows.length;j++){
+    totalMinHH+=Math.round((rows[j].hHD||0)*60); /* Convertir horas decimales a minutos y sumar */
+    tHM+=rows[j].hMD||0;
+    tCB+=rows[j].comb||0;
+    tVT+=rows[j].vuel||0;
+    tM3+=(rows[j].vuel||0)*M3_POR_VUELTA;
+  }
+  document.getElementById('sup-cantPers').value=rows.length;
+  actRes(rows.length,totalMinHH,tHM,tCB,tM3,tVT,dia.pD||0);
+  renderEvtTbl(dia.evts||[]);
+}
+
 function actFP(dk,idx,campo,val){var dia=ST.sup.dias[dk];if(!dia||!dia.filas[idx])return;dia.filas[idx][campo]=val;guardar();}
 function actVuel(dk,idx,val){var dia=ST.sup.dias[dk];if(!dia||!dia.filas[idx])return;var v=parseInt(val)||0;dia.filas[idx].vuel=v;dia.filas[idx].m3=v*M3_POR_VUELTA;guardar();renderSupTbl(dk);}
-function actRes(cnt,tHH,tHM,tCB,tM3,tVT,pD){document.getElementById('sW').textContent=cnt;document.getElementById('sHH').textContent=tHH.toFixed(2);document.getElementById('sPH').textContent=cnt>0?(tHH/cnt).toFixed(2):'0.00';document.getElementById('sHM').textContent=tHM.toFixed(1);document.getElementById('sCB').textContent=tCB.toFixed(0);document.getElementById('sM3').textContent=tM3.toFixed(0);document.getElementById('sVT').textContent=tVT;document.getElementById('sM3T').textContent=tM3.toFixed(0);document.getElementById('sAcum').textContent=parseInt(document.getElementById('sup-prodAcum').value)||11000;}
-function guardarSupEst(){ST.sup.dg={nom:document.getElementById('sup-nombre').value,rut:document.getElementById('sup-rut').value,lug:document.getElementById('sup-lugar').value,cod:document.getElementById('sup-codigo').value,acum:parseInt(document.getElementById('sup-prodAcum').value)||11000};if(ST.curD&&ST.sup.dias[ST.curD]){ST.sup.dias[ST.curD].hor=document.getElementById('sup-hora').value;ST.sup.dias[ST.curD].pD=parseFloat(document.getElementById('sup-prodDia').value)||0;}guardar();toast('Supervisor guardado','ok');}
 
+function actRes(cnt,totalMinHH,tHM,tCB,tM3,tVT,pD){
+  /* Convertir minutos totales a formato HH:MM */
+  var hH=Math.floor(totalMinHH/60);
+  var mH=totalMinHH%60;
+  var formatoHH=String(hH).padStart(2,'0')+':'+String(mH).padStart(2,'0');
+  
+  document.getElementById('sW').textContent=cnt;
+  document.getElementById('sHH').textContent=formatoHH; /* Muestra 16:15 en lugar de 16.25 */
+  document.getElementById('sPH').textContent=cnt>0?(totalMinHH/60/cnt).toFixed(2):'0.00'; /* Promedio en decimal */
+  document.getElementById('sHM').textContent=tHM.toFixed(1);
+  document.getElementById('sCB').textContent=tCB.toFixed(0);
+  document.getElementById('sM3').textContent=tM3.toFixed(0);
+  document.getElementById('sVT').textContent=tVT;
+  document.getElementById('sM3T').textContent=tM3.toFixed(0);
+  document.getElementById('sAcum').textContent=parseInt(document.getElementById('sup-prodAcum').value)||11000;
+}
+
+
+function guardarSupEst(){ST.sup.dg={nom:document.getElementById('sup-nombre').value,rut:document.getElementById('sup-rut').value,lug:document.getElementById('sup-lugar').value,cod:document.getElementById('sup-codigo').value,acum:parseInt(document.getElementById('sup-prodAcum').value)||11000};if(ST.curD&&ST.sup.dias[ST.curD]){ST.sup.dias[ST.curD].hor=document.getElementById('sup-hora').value;ST.sup.dias[ST.curD].pD=parseFloat(document.getElementById('sup-prodDia').value)||0;}guardar();toast('Supervisor guardado','ok');}
 function agregarEvt(){if(!ST.curD||!ST.sup.dias[ST.curD])return;var dia=ST.sup.dias[ST.curD];if(!dia.evts)dia.evts=[];dia.evts.push({hor:'',desc:'',acc:'',resp:''});guardar();renderEvtTbl(dia.evts);}
 function renderEvtTbl(evts){var body=document.getElementById('evtBody');if(!evts||evts.length===0){body.innerHTML='<tr><td colspan="5" class="text-center py-3" style="color:var(--mt)">Sin eventos</td></tr>';return;}var h='';for(var i=0;i<evts.length;i++){var e=evts[i];h+='<tr><td><input type="time" class="ie" style="width:65px" value="'+(e.hor||'')+'" onchange="actEv('+i+',\'hor\',this.value)"></td><td><input type="text" class="ie ie-w" value="'+esc(e.desc||'')+'" onchange="actEv('+i+',\'desc\',this.value)"></td><td><input type="text" class="ie ie-w" value="'+esc(e.acc||'')+'" onchange="actEv('+i+',\'acc\',this.value)"></td><td><input type="text" class="ie" style="width:75px" value="'+esc(e.resp||'')+'" onchange="actEv('+i+',\'resp\',this.value)"></td><td><button class="bt bt-d" style="padding:2px 6px;font-size:10px" onclick="elimEv('+i+')"><i class="fas fa-times"></i></button></td></tr>';}body.innerHTML=h;}
 function actEv(idx,campo,val){if(!ST.curD||!ST.sup.dias[ST.curD])return;var dia=ST.sup.dias[ST.curD];if(!dia.evts||!dia.evts[idx])return;dia.evts[idx][campo]=val;guardar();}
 function elimEv(idx){if(!ST.curD||!ST.sup.dias[ST.curD])return;var dia=ST.sup.dias[ST.curD];if(!dia.evts)return;dia.evts.splice(idx,1);guardar();renderEvtTbl(dia.evts);}
 
-function renderHist(){var c=document.getElementById('histList');if(ST.inds.length===0){c.innerHTML='<div class="text-center py-8 col-span-full" style="color:var(--mt)">No hay registros guardados</div>';return;}var h='',sorted=ST.inds.slice().sort(function(a,b){return(b.id||0)-(a.id||0);});for(var i=0;i<sorted.length;i++){var r=sorted[i];h+='<div class="hcd" onclick="editInd('+(r.id||0)+')"><div class="flex items-center justify-between mb-2"><span class="text-xs font-bold" style="color:var(--ac)">'+esc(r.sn||'')+'</span><span class="text-xs" style="color:var(--mt)">'+fmtF(r.fec)+'</span></div><div class="text-sm font-bold mb-1">'+esc(r.op||'Sin nombre')+'</div><div class="text-xs" style="color:var(--mt)">'+esc(r.maq||'')+' \u2014 '+esc(r.pat||'')+'</div><div class="flex gap-1 mt-2"><button class="bt bt-s text-xs" onclick="event.stopPropagation();expIndExcel('+(r.id||0)+')"><i class="fas fa-file-excel"></i></button><button class="bt bt-d text-xs" onclick="event.stopPropagation();elimInd('+(r.id||0)+')"><i class="fas fa-trash"></i></button></div></div>';}c.innerHTML=h;}
+/* ============ HISTORIAL ============ */
+function renderHist(){var c=document.getElementById('histList');if(ST.inds.length===0){c.innerHTML='<div class="text-center py-8 col-span-full" style="color:var(--mt)">No hay registros guardados</div>';return;}var h='',sorted=ST.inds.slice().sort(function(a,b){return(b.id||0)-(a.id||0);});for(var i=0;i<sorted.length;i++){var r=sorted[i];var isImp=r.sn&&r.sn.indexOf('importado')===0;h+='<div class="hcd" onclick="editInd('+(r.id||0)+')"><div class="flex items-center justify-between mb-2"><span class="text-xs font-bold" style="color:'+(isImp?'var(--inf)':'var(--ac)')+'">'+esc(r.sn||'')+'</span><span class="text-xs" style="color:var(--mt)">'+fmtF(r.fec)+'</span></div><div class="text-sm font-bold mb-1">'+esc(r.op||'Sin nombre')+'</div><div class="text-xs" style="color:var(--mt)">'+esc(r.maq||'')+' \u2014 '+esc(r.pat||'')+'</div><div class="flex gap-1 mt-2"><button class="bt bt-s text-xs" onclick="event.stopPropagation();expIndExcel('+(r.id||0)+')"><i class="fas fa-file-excel"></i></button><button class="bt bt-d text-xs" onclick="event.stopPropagation();elimInd('+(r.id||0)+')"><i class="fas fa-trash"></i></button></div></div>';}c.innerHTML=h;}
 function editInd(id){var r=null;for(var i=0;i<ST.inds.length;i++){if(ST.inds[i].id===id){r=ST.inds[i];break;}}if(!r)return;ST.edId=id;document.getElementById('f-nReport').value=r.nR||'';document.getElementById('f-sector').value=r.sec||'';document.getElementById('f-fecha').value=r.fec||'';document.getElementById('f-cumplio').value=r.cum||'';actCmp(document.getElementById('f-cumplio'),'cI');document.getElementById('f-operador').value=r.op||'';document.getElementById('f-rut').value=r.rut||'';document.getElementById('f-patente').value=r.pat||'';document.getElementById('f-maquinaria').value=r.maq||'';document.getElementById('f-hInicio').value=r.hI||'';document.getElementById('f-hFin').value=r.hF||'';var hTrab=document.getElementById('f-hTrab');hTrab.value=r.hT||'';hTrab.setAttribute('data-d',String(r.hTD||0));document.getElementById('f-cargoComb').value=r.cC||'';actCmp(document.getElementById('f-cargoComb'),'cC');document.getElementById('f-litros').value=r.lit||'';document.getElementById('f-ltsHra').value=r.lH||'';document.getElementById('f-hCarga').value=r.hCa||'';document.getElementById('f-fechaCarga').value=r.fCa||'';document.getElementById('f-horIn').value=r.hoI||'';document.getElementById('f-horFin').value=r.hoF||'';var hMaq=document.getElementById('f-hMaq');hMaq.value=r.hM||'';hMaq.setAttribute('data-d',String(r.hMD||0));document.getElementById('f-kmIn').value=r.kmI||'';document.getElementById('f-kmFin').value=r.kmF||'';document.getElementById('f-kmRec').value=r.kmR||'';document.getElementById('f-actividad').value=r.act||'';document.getElementById('shtLbl').textContent=r.sn||'Editando';setFormLocked(true);cambiarTab('personal');toast('Registro cargado — Modo solo lectura','in');}
 function elimInd(id){if(!confirm('Eliminar este registro?'))return;var idx=-1,r=null;for(var i=0;i<ST.inds.length;i++){if(ST.inds[i].id===id){idx=i;r=ST.inds[i];break;}}if(idx>=0){if(r)quitarDeDia(r.fec,id);ST.inds.splice(idx,1);if(ST.edId===id){ST.edId=null;limpiarForm();}guardar();renderHist();toast('Registro eliminado','in');}}
 
+/* ============ EXPORTACIONES ============ */
 function sc(ws,ref,val){try{var cell=ws.getCell(ref);cell.value=(val===null||val===undefined||val==='')?'':val;}catch(e){}}
 function dlBlob(buf,nombre){var blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=nombre;a.click();setTimeout(function(){URL.revokeObjectURL(url);},1000);}
 async function expPersExcel(){var d=leerForm();if(!d.op.trim()){toast('Complete el nombre del operador','er');return;}var wb=new ExcelJS.Workbook();var ws;if(TPL_PERS){await wb.xlsx.load(TPL_PERS);ws=wb.worksheets[0];}else{ws=wb.addWorksheet('Personal');ws.getColumn('D').width=16;ws.getColumn('H').width=16;ws.getColumn('K').width=14;}var m=CELL_MAP_PERS;sc(ws,m.nR,parseInt(d.nR)||'');sc(ws,m.sec,d.sec);sc(ws,m.fec,d.fec?fmtF(d.fec):'');sc(ws,m.cum,d.cum);sc(ws,m.op,d.op);sc(ws,m.rut,d.rut);sc(ws,m.pat,d.pat);sc(ws,m.maq,d.maq);sc(ws,m.hI,d.hI);sc(ws,m.hF,d.hF);sc(ws,m.hT,d.hT);sc(ws,m.cC,d.cC);sc(ws,m.lit,d.lit);sc(ws,m.lH,d.lH);sc(ws,m.hCa,d.hCa);sc(ws,m.fCa,d.fCa?fmtF(d.fCa):'');sc(ws,m.hoI,d.hoI?parseFloat(d.hoI):'');sc(ws,m.hoF,d.hoF?parseFloat(d.hoF):'');sc(ws,m.hM,d.hM);sc(ws,m.kmI,d.kmI?parseInt(d.kmI):'');sc(ws,m.kmF,d.kmF?parseInt(d.kmF):'');sc(ws,m.kmR,d.kmR);sc(ws,m.act,d.act);var buf=await wb.xlsx.writeBuffer();dlBlob(buf,'Personal_'+(d.op||'reg').replace(/\s+/g,'_')+'_'+(d.fec||'sf')+'.xlsx');toast('Excel Personal descargado','ok');}
 async function expIndExcel(id){var r=null;for(var i=0;i<ST.inds.length;i++){if(ST.inds[i].id===id){r=ST.inds[i];break;}}if(!r)return;var wb=new ExcelJS.Workbook();var ws;if(TPL_PERS){await wb.xlsx.load(TPL_PERS);ws=wb.worksheets[0];}else{ws=wb.addWorksheet('Personal');ws.getColumn('D').width=16;ws.getColumn('H').width=16;ws.getColumn('K').width=14;}var m=CELL_MAP_PERS;sc(ws,m.nR,parseInt(r.nR)||'');sc(ws,m.sec,r.sec);sc(ws,m.fec,r.fec?fmtF(r.fec):'');sc(ws,m.cum,r.cum);sc(ws,m.op,r.op);sc(ws,m.rut,r.rut);sc(ws,m.pat,r.pat);sc(ws,m.maq,r.maq);sc(ws,m.hI,r.hI);sc(ws,m.hF,r.hF);sc(ws,m.hT,r.hT);sc(ws,m.cC,r.cC);sc(ws,m.lit,r.lit);sc(ws,m.lH,r.lH);sc(ws,m.hCa,r.hCa);sc(ws,m.fCa,r.fCa?fmtF(r.fCa):'');sc(ws,m.hoI,r.hoI?parseFloat(r.hoI):'');sc(ws,m.hoF,r.hoF?parseFloat(r.hoF):'');sc(ws,m.hM,r.hM);sc(ws,m.kmI,r.kmI?parseInt(r.kmI):'');sc(ws,m.kmF,r.kmF?parseInt(r.kmF):'');sc(ws,m.kmR,r.kmR);sc(ws,m.act,r.act);var buf=await wb.xlsx.writeBuffer();dlBlob(buf,'Personal_'+(r.op||'reg').replace(/\s+/g,'_')+'_'+(r.fec||'sf')+'.xlsx');toast('Excel Personal descargado','ok');}
-async function expSupExcel(){if(!ST.curD||!ST.sup.dias[ST.curD]){toast('No hay datos del supervisor para exportar','er');return;}var dia=ST.sup.dias[ST.curD];var dg=ST.sup.dg;var wb=new ExcelJS.Workbook();var ws;if(TPL_SUP){await wb.xlsx.load(TPL_SUP);ws=wb.worksheets[0];}else{ws=wb.addWorksheet('Supervisor');var cw={A:5,B:22,C:8,D:14,E:20,F:12,G:10,H:10,I:10,J:10,K:10,L:16,M:22,N:8,O:8};Object.keys(cw).forEach(function(c){ws.getColumn(c).width=cw[c];});var hdrs=['N','Nombre','NRep','RUT','Maquinaria','Patente','H.Maq','Comb(L)','H.Inicio','H.Fin','H.Hombre','Prod.Realizada','Actividad Realizada','Vueltas','m3'];var hCols=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O'];for(var hi=0;hi<hdrs.length;hi++){sc(ws,hCols[hi]+'10',hdrs[hi]);}}var mg=CELL_MAP_SUP.dg;sc(ws,mg.fec,dia.fec?fmtF(dia.fec):'');sc(ws,mg.hora,dia.hor||'');sc(ws,mg.nom,dg.nom||'');sc(ws,mg.rut,dg.rut||'');sc(ws,mg.lugar,dg.lug||'');sc(ws,mg.cod,dg.cod||'');sc(ws,mg.prodAcum,dg.acum||11000);sc(ws,mg.cantPers,dia.filas.length||0);var mt=CELL_MAP_SUP.tbl;var sr=mt.startRow;var cols=mt.cols;var rows=dia.filas;for(var i=0;i<rows.length;i++){var r=rows[i];var row=sr+i;sc(ws,cols.n+row,i+1);sc(ws,cols.nom+row,r.nom||'');sc(ws,cols.nR+row,r.nR||'');sc(ws,cols.rut+row,r.rut||'');sc(ws,cols.maq+row,r.maq||'');sc(ws,cols.pat+row,r.pat||'');sc(ws,cols.hM+row,r.hM||'');sc(ws,cols.comb+row,r.comb||0);sc(ws,cols.hI+row,r.hI||'');sc(ws,cols.hF+row,r.hF||'');sc(ws,cols.hH+row,r.hH||'');sc(ws,cols.prodR+row,r.prodR||'');sc(ws,cols.actR+row,r.actR||'');sc(ws,cols.vuel+row,r.vuel||0);sc(ws,cols.m3+row,(r.vuel||0)*M3_POR_VUELTA);}var tHH=0,tHM=0,tCB=0,tM3=0,tVT=0;for(var j=0;j<rows.length;j++){tHH+=rows[j].hHD||0;tHM+=rows[j].hMD||0;tCB+=rows[j].comb||0;tVT+=rows[j].vuel||0;tM3+=(rows[j].vuel||0)*M3_POR_VUELTA;}var mr=CELL_MAP_SUP.res;sc(ws,mr.cantPers,rows.length);sc(ws,mr.tHH,tHH.toFixed(2));sc(ws,mr.promH,rows.length>0?(tHH/rows.length).toFixed(2):'0.00');sc(ws,mr.tHM,tHM.toFixed(1));sc(ws,mr.tCB,tCB.toFixed(0));sc(ws,mr.tM3,tM3.toFixed(0));sc(ws,mr.tVT,tVT);var me=CELL_MAP_SUP.evt;var evs=dia.evts||[];for(var ei=0;ei<evs.length;ei++){var ev=evs[ei];var erow=me.startRow+ei;sc(ws,me.cols.hora+erow,ev.hor||'');sc(ws,me.cols.desc+erow,ev.desc||'');sc(ws,me.cols.acc+erow,ev.acc||'');sc(ws,me.cols.resp+erow,ev.resp||'');}var buf=await wb.xlsx.writeBuffer();dlBlob(buf,'Supervisor_'+fmtF(dia.fec).replace(/\//g,'-')+'.xlsx');toast('Excel Supervisor descargado','ok');}
-function expPersPDF(){var d=leerForm();if(!d.op.trim()){toast('Complete el nombre del operador','er');return;}var jsPDF=window.jspdf.jsPDF;var doc=new jsPDF();doc.setFontSize(16);doc.text('EXPLONORTE Chile SpA',14,18);doc.setFontSize(10);doc.text('Planilla de Trabajo de Personal',14,24);var data=[['N Reporte',d.nR||''],['Sector',d.sec||''],['Fecha',d.fec?fmtF(d.fec):''],['Cumplio',d.cum||''],['Operador',d.op||''],['RUT',d.rut||''],['Patente',d.pat||''],['Maquinaria',d.maq||''],['Hora Inicio',d.hI||''],['Hora Fin',d.hF||''],['Horas Trabajadas',d.hT||''],['Cargo Combustible',d.cC||''],['Litros',d.lit||''],['Lts/Hra',d.lH||''],['Hora Carga',d.hCa||''],['Fecha Carga',d.fCa?fmtF(d.fCa):''],['Horometro Inicio',d.hoI||''],['Horometro Fin',d.hoF||''],['Horas Maquina',d.hM||''],['Km Inicial',d.kmI||''],['Km Final',d.kmF||''],['Km Recorridos',d.kmR||''],['Actividad',d.act||'']];doc.autoTable({startY:30,head:[['Campo','Valor']],body:data,theme:'grid',headStyles:{fillColor:[212,148,10]},styles:{fontSize:8}});doc.save('Personal_'+(d.op||'reg').replace(/\s+/g,'_')+'.pdf');toast('PDF Personal descargado','ok');}
-function expSupPDF(){if(!ST.curD||!ST.sup.dias[ST.curD]){toast('No hay datos del supervisor','er');return;}var dia=ST.sup.dias[ST.curD];var dg=ST.sup.dg;var jsPDF=window.jspdf.jsPDF;var doc=new jsPDF({orientation:'landscape'});doc.setFontSize(14);doc.text('EXPLONORTE Chile SpA — Planilla Supervisor',14,14);doc.setFontSize(9);doc.text('Fecha: '+fmtF(dia.fec)+'  Hora: '+(dia.hor||'')+'  Supervisor: '+(dg.nom||'')+'  RUT: '+(dg.rut||'')+'  Lugar: '+(dg.lug||''),14,20);var rows=dia.filas;var body=[];for(var i=0;i<rows.length;i++){var r=rows[i];body.push([i+1,r.nom||'',r.nR||'',r.rut||'',r.maq||'',r.pat||'',r.hM||'',r.comb||'',r.hI||'',r.hF||'',r.hH||'',r.prodR||'',r.actR||'',r.vuel||0,(r.vuel||0)*M3_POR_VUELTA]);}doc.autoTable({startY:24,head:[['N','Nombre','NRep','RUT','Maquinaria','Patente','H.Maq','Comb','H.Ini','H.Fin','H.H','Prod.R','Actividad','Vueltas','m3']],body:body,theme:'grid',headStyles:{fillColor:[212,148,10],fontSize:6},styles:{fontSize:6,cellPadding:1}});var y=doc.lastAutoTable.finalY+8;var tHH=0,tHM=0,tCB=0,tM3=0,tVT=0;for(var j=0;j<rows.length;j++){tHH+=rows[j].hHD||0;tHM+=rows[j].hMD||0;tCB+=rows[j].comb||0;tVT+=rows[j].vuel||0;tM3+=(rows[j].vuel||0)*M3_POR_VUELTA;}doc.setFontSize(8);doc.text('Cant.Personal: '+rows.length+'  Total H.Hombre: '+tHH.toFixed(2)+'  Prom: '+(rows.length>0?(tHH/rows.length).toFixed(2):'0')+'  Total H.Maquina: '+tHM.toFixed(1)+'  Total Comb: '+tCB.toFixed(0)+'  Total m3: '+tM3.toFixed(0),14,y);doc.save('Supervisor_'+fmtF(dia.fec).replace(/\//g,'-')+'.pdf');toast('PDF Supervisor descargado','ok');}
-</script>
 
+async function expSupExcel(){if(!ST.curD||!ST.sup.dias[ST.curD]){toast('No hay datos del supervisor para exportar','er');return;}var dia=ST.sup.dias[ST.curD];var dg=ST.sup.dg;var wb=new ExcelJS.Workbook();var ws;if(TPL_SUP){await wb.xlsx.load(TPL_SUP);ws=wb.worksheets[0];}else{ws=wb.addWorksheet('Supervisor');var cw={A:5,B:22,C:8,D:14,E:20,F:12,G:10,H:10,I:10,J:10,K:10,L:16,M:22,N:8,O:8};Object.keys(cw).forEach(function(c){ws.getColumn(c).width=cw[c];});var hdrs=['N','Nombre','NRep','RUT','Maquinaria','Patente','H.Maq','Comb(L)','H.Inicio','H.Fin','H.Hombre','Prod.Realizada','Actividad Realizada','Vueltas','m3'];var hCols=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O'];for(var hi=0;hi<hdrs.length;hi++){sc(ws,hCols[hi]+'10',hdrs[hi]);}}var mg=CELL_MAP_SUP.dg;sc(ws,mg.fec,dia.fec?fmtF(dia.fec):'');sc(ws,mg.hora,dia.hor||'');sc(ws,mg.nom,dg.nom||'');sc(ws,mg.rut,dg.rut||'');sc(ws,mg.lugar,dg.lug||'');sc(ws,mg.cod,dg.cod||'');sc(ws,mg.prodAcum,dg.acum||11000);sc(ws,mg.cantPers,dia.filas.length||0);var mt=CELL_MAP_SUP.tbl;var sr=mt.startRow;var cols=mt.cols;var rows=dia.filas;for(var i=0;i<rows.length;i++){var r=rows[i];var row=sr+i;sc(ws,cols.n+row,i+1);sc(ws,cols.nom+row,r.nom||'');sc(ws,cols.nR+row,r.nR||'');sc(ws,cols.rut+row,r.rut||'');sc(ws,cols.maq+row,r.maq||'');sc(ws,cols.pat+row,r.pat||'');sc(ws,cols.hM+row,r.hM||'');sc(ws,cols.comb+row,r.comb||0);sc(ws,cols.hI+row,r.hI||'');sc(ws,cols.hF+row,r.hF||'');sc(ws,cols.hH+row,r.hH||'');sc(ws,cols.prodR+row,r.prodR||'');sc(ws,cols.actR+row,r.actR||'');sc(ws,cols.vuel+row,r.vuel||0);sc(ws,cols.m3+row,(r.vuel||0)*M3_POR_VUELTA);}
+
+
+  var totalMinHH=0,tHM=0,tCB=0,tM3=0,tVT=0;
+  for(var j=0;j<rows.length;j++){
+    totalMinHH+=Math.round((rows[j].hHD||0)*60);
+    tHM+=rows[j].hMD||0;
+    tCB+=rows[j].comb||0;
+    tVT+=rows[j].vuel||0;
+    tM3+=(rows[j].vuel||0)*M3_POR_VUELTA;
+  }
+  /* Formatear Total HH:MM para Excel */
+  var hHE=Math.floor(totalMinHH/60);
+  var mHE=totalMinHH%60;
+  var formatoHHExcel=String(hHE).padStart(2,'0')+':'+String(mHE).padStart(2,'0');
+  
+  var mr=CELL_MAP_SUP.res;
+  sc(ws,mr.cantPers,rows.length);
+  sc(ws,mr.tHH,formatoHHExcel); /* Exporta en formato HH:MM */
+  sc(ws,mr.promH,rows.length>0?(totalMinHH/60/rows.length).toFixed(2):'0.00');
+  sc(ws,mr.tHM,tHM.toFixed(1));
+  sc(ws,mr.tCB,tCB.toFixed(0));
+  sc(ws,mr.tM3,tM3.toFixed(0));
+  sc(ws,mr.tVT,tVT);
+
+
+var me=CELL_MAP_SUP.evt;var evs=dia.evts||[];for(var ei=0;ei<evs.length;ei++){var ev=evs[ei];var erow=me.startRow+ei;sc(ws,me.cols.hora+erow,ev.hor||'');sc(ws,me.cols.desc+erow,ev.desc||'');sc(ws,me.cols.acc+erow,ev.acc||'');sc(ws,me.cols.resp+erow,ev.resp||'');}var buf=await wb.xlsx.writeBuffer();dlBlob(buf,'Supervisor_'+fmtF(dia.fec).replace(/\//g,'-')+'.xlsx');toast('Excel Supervisor descargado','ok');}
+
+function expPersPDF(){var d=leerForm();if(!d.op.trim()){toast('Complete el nombre del operador','er');return;}var jsPDF=window.jspdf.jsPDF;var doc=new jsPDF();doc.setFontSize(16);doc.text('EXPLONORTE Chile SpA',14,18);doc.setFontSize(10);doc.text('Planilla de Trabajo de Personal',14,24);var data=[['N Reporte',d.nR||''],['Sector',d.sec||''],['Fecha',d.fec?fmtF(d.fec):''],['Cumplio',d.cum||''],['Operador',d.op||''],['RUT',d.rut||''],['Patente',d.pat||''],['Maquinaria',d.maq||''],['Hora Inicio',d.hI||''],['Hora Fin',d.hF||''],['Horas Trabajadas',d.hT||''],['Cargo Combustible',d.cC||''],['Litros',d.lit||''],['Lts/Hra',d.lH||''],['Hora Carga',d.hCa||''],['Fecha Carga',d.fCa?fmtF(d.fCa):''],['Horometro Inicio',d.hoI||''],['Horometro Fin',d.hoF||''],['Horas Maquina',d.hM||''],['Km Inicial',d.kmI||''],['Km Final',d.kmF||''],['Km Recorridos',d.kmR||''],['Actividad',d.act||'']];doc.autoTable({startY:30,head:[['Campo','Valor']],body:data,theme:'grid',headStyles:{fillColor:[212,148,10]},styles:{fontSize:8}});doc.save('Personal_'+(d.op||'reg').replace(/\s+/g,'_')+'.pdf');toast('PDF Personal descargado','ok');}
+function expSupPDF(){if(!ST.curD||!ST.sup.dias[ST.curD]){toast('No hay datos del supervisor','er');return;}var dia=ST.sup.dias[ST.curD];var dg=ST.sup.dg;var jsPDF=window.jspdf.jsPDF;var doc=new jsPDF({orientation:'landscape'});doc.setFontSize(14);doc.text('EXPLONORTE Chile SpA — Planilla Supervisor',14,14);doc.setFontSize(9);doc.text('Fecha: '+fmtF(dia.fec)+'  Hora: '+(dia.hor||'')+'  Supervisor: '+(dg.nom||'')+'  RUT: '+(dg.rut||'')+'  Lugar: '+(dg.lug||''),14,20);var rows=dia.filas;var body=[];for(var i=0;i<rows.length;i++){var r=rows[i];body.push([i+1,r.nom||'',r.nR||'',r.rut||'',r.maq||'',r.pat||'',r.hM||'',r.comb||'',r.hI||'',r.hF||'',r.hH||'',r.prodR||'',r.actR||'',r.vuel||0,(r.vuel||0)*M3_POR_VUELTA]);}doc.autoTable({startY:24,head:[['N','Nombre','NRep','RUT','Maquinaria','Patente','H.Maq','Comb','H.Ini','H.Fin','H.H','Prod.R','Actividad','Vueltas','m3']],body:body,theme:'grid',headStyles:{fillColor:[212,148,10],fontSize:6},styles:{fontSize:6,cellPadding:1}});var y=doc.lastAutoTable.finalY+8;
+
+
+  var totalMinHH=0,tHM=0,tCB=0,tM3=0,tVT=0;
+  for(var j=0;j<rows.length;j++){
+    totalMinHH+=Math.round((rows[j].hHD||0)*60);
+    tHM+=rows[j].hMD||0;
+    tCB+=rows[j].comb||0;
+    tVT+=rows[j].vuel||0;
+    tM3+=(rows[j].vuel||0)*M3_POR_VUELTA;
+  }
+  var hHP=Math.floor(totalMinHH/60);
+  var mHP=totalMinHH%60;
+  var formatoHHPDF=String(hHP).padStart(2,'0')+':'+String(mHP).padStart(2,'0');
+  
+  doc.setFontSize(8);
+  doc.text('Cant.Personal: '+rows.length+'  Total H.Hombre: '+formatoHHPDF+'  Prom: '+(rows.length>0?(totalMinHH/60/rows.length).toFixed(2):'0')+'  Total H.Maquina: '+tHM.toFixed(1)+'  Total Comb: '+tCB.toFixed(0)+'  Total m3: '+tM3.toFixed(0),14,y);
+doc.save('Supervisor_'+fmtF(dia.fec).replace(/\//g,'-')+'.pdf');toast('PDF Supervisor descargado','ok');}
+
+
+</script>
 
 
 <!-- Service Worker Registration -->
