@@ -84,8 +84,6 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 </style>
 
 
-
-
 <!-- PWA: Manifest + Service Worker -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#D4940A">
@@ -97,9 +95,8 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 
 
 
-
-
-
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#D4940A">
 </head>
 <body>
 <div class="rz">
@@ -163,8 +160,8 @@ body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(r
 <hr class="sdiv">
 <div class="sec-t"><i class="fas fa-clock text-xs"></i> Horas de Trabajo</div>
 <div class="grid grid-cols-3 gap-3 mb-3">
-<div><label class="lbl">Hora Inicio <span class="req">*</span></label><input type="time" id="f-hInicio" class="inp" onchange="calcHT()"></div>
-<div><label class="lbl">Hora Finalizacion</label><input type="time" id="f-hFin" class="inp" onchange="calcHT()"></div>
+<div><label class="lbl">Hora Inicio <span class="req">*</span></label><input type="time" id="f-hInicio" class="inp" oninput="calcHT()"></div>
+<div><label class="lbl">Hora Finalizacion</label><input type="time" id="f-hFin" class="inp" oninput="calcHT()"></div>
 <div>
     <label class="lbl">Horas Trabajadas</label>
     <div class="flex gap-1 items-center">
@@ -369,6 +366,40 @@ function getCellValue(ws, ref){
   return cell.v!==undefined ? String(cell.v) : '';
 }
 
+// Función clave para normalizar cualquier valor de hora a formato HH:MM
+function normalizeTime(val) {
+    if (!val) return '';
+    if (val instanceof Date) {
+        return String(val.getHours()).padStart(2,'0') + ':' + String(val.getMinutes()).padStart(2,'0');
+    }
+    var str = String(val).toUpperCase().trim();
+    var isPM = str.indexOf('PM') > -1;
+    var isAM = str.indexOf('AM') > -1;
+    str = str.replace('AM','').replace('PM','').trim();
+    
+    // Si es un número puro (fracción de día en Excel)
+    var num = parseFloat(str);
+    if (!isNaN(num) && str.indexOf(':') === -1) {
+        if (num > 0 && num < 1) { 
+            var totalMins = Math.round(num * 24 * 60);
+            var h = Math.floor(totalMins / 60);
+            var m = totalMins % 60;
+            return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+        }
+    }
+    
+    // Si tiene formato de texto con dos puntos (08:50, 8:50 AM)
+    if (str.indexOf(':') > -1) {
+        var parts = str.split(':');
+        var h = parseInt(parts[0], 10) || 0;
+        var m = parseInt(parts[1], 10) || 0;
+        if (isPM && h < 12) h += 12;
+        if (isAM && h === 12) h = 0;
+        return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+    }
+    return str;
+}
+
 function cargar(){
   try{
     var s=localStorage.getItem('exp_norte');
@@ -389,7 +420,51 @@ function cargar(){
 function guardar(){try{localStorage.setItem('exp_norte',JSON.stringify(ST));}catch(e){}actSt();}
 function actSt(){var n=ST.inds.length;document.getElementById('stInfo').textContent=n+' registro'+(n!==1?'s':'');}
 function formatBytes(b){if(!b)return '0 B';var size=(b.byteLength!==undefined)?b.byteLength:((b.size!==undefined)?b.size:(typeof b==='number'?b:0));if(size<1024)return size+' B';if(size<1048576)return(size/1024).toFixed(1)+' KB';return(size/1048576).toFixed(1)+' MB';}
-var DB_NAME='explonorte_tpl';var DB_VER=1;function openDB(cb){var r=indexedDB.open(DB_NAME,DB_VER);r.onupgradeneeded=function(e){var db=e.target.result;if(!db.objectStoreNames.contains('tpls'))db.createObjectStore('tpls',{keyPath:'id'});};r.onsuccess=function(e){cb(e.target.result);};r.onerror=function(){cb(null);};}function guardarTplDB(k,buf,cb){openDB(function(db){if(!db){if(cb)cb(false);return;}var tx=db.transaction('tpls','readwrite');tx.objectStore('tpls').put({id:k,data:buf});tx.oncomplete=function(){if(cb)cb(true);};tx.onerror=function(){if(cb)cb(false);};});}function cargarTplDB(k,cb){openDB(function(db){if(!db){cb(null);return;}var tx=db.transaction('tpls','readonly');var req=tx.objectStore('tpls').get(k);req.onsuccess=function(){if(req.result)cb(req.result.data);else cb(null);};req.onerror=function(){cb(null);};});}function elimTplDB(k,cb){openDB(function(db){if(!db){if(cb)cb();return;}var tx=db.transaction('tpls','readwrite');tx.objectStore('tpls').delete(k);tx.oncomplete=function(){if(cb)cb();};});}
+
+var DB_NAME='explonorte_tpl';var DB_VER=2; 
+function openDB(cb){
+  var r=indexedDB.open(DB_NAME,DB_VER);
+  r.onupgradeneeded=function(e){
+    var db=e.target.result;
+    if(!db.objectStoreNames.contains('tpls'))db.createObjectStore('tpls',{keyPath:'id'});
+    if(!db.objectStoreNames.contains('sup_files'))db.createObjectStore('sup_files',{keyPath:'id'});
+  };
+  r.onsuccess=function(e){cb(e.target.result);};
+  r.onerror=function(){cb(null);};
+}
+function guardarTplDB(k,buf,cb){openDB(function(db){if(!db){if(cb)cb(false);return;}var tx=db.transaction('tpls','readwrite');tx.objectStore('tpls').put({id:k,data:buf});tx.oncomplete=function(){if(cb)cb(true);};tx.onerror=function(){if(cb)cb(false);};});}
+function cargarTplDB(k,cb){openDB(function(db){if(!db){cb(null);return;}var tx=db.transaction('tpls','readonly');var req=tx.objectStore('tpls').get(k);req.onsuccess=function(){if(req.result)cb(req.result.data);else cb(null);};req.onerror=function(){cb(null);};});}
+function elimTplDB(k,cb){openDB(function(db){if(!db){if(cb)cb();return;}var tx=db.transaction('tpls','readwrite');tx.objectStore('tpls').delete(k);tx.oncomplete=function(){if(cb)cb();};});}
+
+function guardarSupFileDB(fecha, filename, buf, cb){
+  openDB(function(db){
+    if(!db){if(cb)cb(false);return;}
+    var tx=db.transaction('sup_files','readwrite');
+    tx.objectStore('sup_files').put({id: fecha + '/' + filename, filename: filename, data:buf});
+    tx.oncomplete=function(){if(cb)cb(true);};
+    tx.onerror=function(){if(cb)cb(false);};
+  });
+}
+function cargarSupFileDB(id, cb){
+  openDB(function(db){
+    if(!db){cb(null);return;}
+    var tx=db.transaction('sup_files','readonly');
+    var req=tx.objectStore('sup_files').get(id);
+    req.onsuccess=function(){if(req.result)cb(req.result);else cb(null);};
+    req.onerror=function(){cb(null);};
+  });
+}
+function elimSupFilesDB(fecha, filenames, cb){
+  if(!filenames || !filenames.length){ if(cb)cb(); return; }
+  openDB(function(db){
+    if(!db){if(cb)cb();return;}
+    var tx=db.transaction('sup_files','readwrite');
+    var store=tx.objectStore('sup_files');
+    filenames.forEach(function(fn){ store.delete(fecha + '/' + fn); });
+    tx.oncomplete=function(){if(cb)cb();};
+    tx.onerror=function(){if(cb)cb();};
+  });
+}
 
 function cargarPlantilla(ev){
   var f=ev.target.files[0];if(!f)return;
@@ -585,13 +660,20 @@ function renderHistSup(){
     var dia=ST.sup.dias[f];
     var n=(dia.filas||[]).length;
     var adminBtns = IS_ADMIN ? '<button class="bt bt-d text-xs" onclick="event.stopPropagation();elimSupDia(\''+f+'\')" title="Eliminar (Admin)"><i class="fas fa-trash"></i></button>' : '';
+    
+    var archivos = dia.archivos || [];
+    var archivosHtml = archivos.length > 0 ? '<div class="text-xs mt-2 mb-2" style="color:var(--mt)">Planillas subidas:</div><div class="flex flex-wrap gap-2 mb-2">'+archivos.map(function(fn){
+      return '<button class="bt bt-i text-xs" onclick="event.stopPropagation();descargarSupFile(\''+f+'\',\''+fn.replace(/'/g, "\\'")+'\')"><i class="fas fa-file-excel"></i> '+esc(fn)+'</button>';
+    }).join('')+'</div>' : '';
+    
     return '<div class="hcd" onclick="editarSup(\''+f+'\')">'+
            '<div class="flex justify-between items-start mb-2">'+
              '<div><span class="text-xs font-bold" style="color:var(--ac)">'+fmtF(f)+'</span></div>'+
              '<span class="text-xs px-2 py-0.5 rounded-full" style="background:rgba(56,189,248,.1);color:#38BDF8;border:1px solid rgba(56,189,248,.2)">'+n+' registros</span>'+
            '</div>'+
            '<div class="text-sm font-bold mb-1">'+esc(ST.sup.dg.nom||'Supervisor')+'</div>'+
-           '<div class="text-xs mb-3" style="color:var(--mt)">'+esc(ST.sup.dg.lug||'')+'</div>'+
+           '<div class="text-xs" style="color:var(--mt)">'+esc(ST.sup.dg.lug||'')+'</div>'+
+           archivosHtml+
            '<div class="flex gap-2">'+
              '<button class="bt bt-s text-xs" onclick="event.stopPropagation();editarSup(\''+f+'\')"><i class="fas fa-folder-open"></i> Abrir</button>'+
              adminBtns+
@@ -607,11 +689,28 @@ function editarSup(f){
 function elimSupDia(fecha){
   if(!IS_ADMIN){toast('Solo Admin puede eliminar','er');return;}
   if(!confirm('¿Eliminar el reporte del día '+fmtF(fecha)+'?')) return;
-  delete ST.sup.dias[fecha];
-  if(ST.curD === fecha) ST.curD = Object.keys(ST.sup.dias).sort()[0] || null;
-  guardar();
-  renderHistSup();
-  toast('Reporte eliminado','ok');
+  var archivos = ST.sup.dias[fecha].archivos || [];
+  elimSupFilesDB(fecha, archivos, function(){
+    delete ST.sup.dias[fecha];
+    if(ST.curD === fecha) ST.curD = Object.keys(ST.sup.dias).sort()[0] || null;
+    guardar();
+    renderHistSup();
+    toast('Reporte y archivos eliminados','ok');
+  });
+}
+function descargarSupFile(fecha, filename){
+  cargarSupFileDB(fecha + '/' + filename, function(rec){
+    if(rec && rec.data){
+      var blob = new Blob([rec.data], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+    } else {
+      toast('Archivo no encontrado en la base de datos local','er');
+    }
+  });
 }
 
 /* ================ SUPERVISOR: IMPORTACIÓN EXCEL ================ */
@@ -626,21 +725,11 @@ function leerPlanillaPersonal(arrayBuffer){
       d[key]=getCellValue(ws, CELL_MAP_PERS[key]);
     }
 
-    // Función para corregir horas que vienen como fracción decimal de Excel (ej: 0.3541666)
-    function excelTimeToHHMM(val) {
-        var num = parseFloat(val);
-        if (!isNaN(num) && num > 0 && num < 1) {
-            var totalMins = Math.round(num * 24 * 60);
-            var h = Math.floor(totalMins / 60);
-            var m = totalMins % 60;
-            return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
-        }
-        return val;
-    }
-    d.hT = excelTimeToHHMM(d.hT);
-    d.hM = excelTimeToHHMM(d.hM);
-    d.hI = excelTimeToHHMM(d.hI);
-    d.hF = excelTimeToHHMM(d.hF);
+    // Normalizamos estrictamente los formatos de hora a HH:MM al importar
+    d.hI = normalizeTime(d.hI);
+    d.hF = normalizeTime(d.hF);
+    d.hT = normalizeTime(d.hT);
+    d.hCa = normalizeTime(d.hCa);
 
     var fechaRaw=d.fec;
     var dateObj=null;
@@ -687,7 +776,7 @@ function planillaToFilaSup(d){
     comb:   d.totalLit || '', 
     hI:     d.hI   || '',  
     hF:     d.hF   || '',  
-    hH:     d.hT   || '',  // Se recalculará automáticamente en renderSup
+    hH:     d.hT   || '',  
     actR:   d.act  || '',  
     vuel:   '',            
     m3:     ''             
@@ -715,10 +804,11 @@ function procesarArchivosImport(files){
   arr.forEach(function(f){
     var reader=new FileReader();
     reader.onload=function(e){
+      var arrayBuffer = e.target.result;
       try{
-        var d=leerPlanillaPersonal(e.target.result);
+        var d=leerPlanillaPersonal(arrayBuffer);
         if(d){
-          filas.push({archivo:f.name, datos:d});
+          filas.push({archivo:f.name, datos:d, buffer: arrayBuffer});
           if(d.fecISO && !primerFecha) primerFecha=d.fecISO;
         }
       }catch(err){
@@ -739,13 +829,13 @@ function finalizarImport(filas, primerFecha){
     return;
   }
   var fecha = primerFecha || (new Date()).toISOString().split('T')[0];
-  if(!ST.sup.dias[fecha]) ST.sup.dias[fecha]={filas:[],eventos:[]};
+  if(!ST.sup.dias[fecha]) ST.sup.dias[fecha]={filas:[],eventos:[],archivos:[]};
   if(!ST.sup.dias[fecha].filas) ST.sup.dias[fecha].filas=[];
   if(!ST.sup.dias[fecha].eventos) ST.sup.dias[fecha].eventos=[];
+  if(!ST.sup.dias[fecha].archivos) ST.sup.dias[fecha].archivos=[];
 
   filas.forEach(function(item){
     var nuevaFila = planillaToFilaSup(item.datos);
-    // Evitar duplicados: si ya existe el mismo N Reporte, lo reemplazamos
     var existingIndex = -1;
     if(nuevaFila.nR) {
         existingIndex = ST.sup.dias[fecha].filas.findIndex(function(f){ return f.nR === nuevaFila.nR; });
@@ -755,11 +845,19 @@ function finalizarImport(filas, primerFecha){
     } else {
         ST.sup.dias[fecha].filas.push( nuevaFila );
     }
+    
+    if(ST.sup.dias[fecha].archivos.indexOf(item.archivo) === -1){
+        ST.sup.dias[fecha].archivos.push(item.archivo);
+    }
+    guardarSupFileDB(fecha, item.archivo, item.buffer, function(ok){
+        if(!ok) console.warn("No se pudo guardar el archivo: ", item.archivo);
+    });
   });
 
   ST.curD = fecha;
   guardar();
   renderSup();
+  renderHistSup();
   mostrarCellMapModal(filas);   
   toast(filas.length+' planilla(s) importada(s) correctamente','ok');
 }
@@ -768,9 +866,10 @@ function finalizarImport(filas, primerFecha){
 function cambiarFechaSup(newDate){
   if(!newDate) return;
   ST.curD = newDate;
-  if(!ST.sup.dias[newDate]) ST.sup.dias[newDate] = {filas:[],eventos:[]};
+  if(!ST.sup.dias[newDate]) ST.sup.dias[newDate] = {filas:[],eventos:[],archivos:[]};
   if(!ST.sup.dias[newDate].filas) ST.sup.dias[newDate].filas=[];
   if(!ST.sup.dias[newDate].eventos) ST.sup.dias[newDate].eventos=[];
+  if(!ST.sup.dias[newDate].archivos) ST.sup.dias[newDate].archivos=[];
   guardar();
   renderSup();
 }
@@ -783,14 +882,12 @@ function actualizarHHSup(i, doSave) {
   var hh = '00:00';
   
   if(hI && hF) {
-    var p1 = String(hI).split(':');
-    var p2 = String(hF).split(':');
-    if(p1.length===2 && p2.length===2) {
-        var diff = (parseInt(p2[0])*60 + parseInt(p2[1])) - (parseInt(p1[0])*60 + parseInt(p1[1]));
-        if(diff < 0) diff += 1440; // Si pasa de medianoche
-        var h = Math.floor(diff/60);
-        var m = diff%60;
-        hh = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+    var decI = parseHoraToDec(hI);
+    var decF = parseHoraToDec(hF);
+    if(!isNaN(decI) && !isNaN(decF)) {
+        var diff = decF - decI;
+        if(diff < 0) diff += 24; 
+        hh = decToHHMM(diff);
     }
   }
   
@@ -817,10 +914,10 @@ function renderSup(){
     var t=new Date(); var ty=t.getFullYear();var tm=String(t.getMonth()+1).padStart(2,'0');var td=String(t.getDate()).padStart(2,'0');
     ST.curD = ty+'-'+tm+'-'+td;
   }
-  if(!ST.sup.dias[ST.curD]) ST.sup.dias[ST.curD] = {filas:[],eventos:[]};
+  if(!ST.sup.dias[ST.curD]) ST.sup.dias[ST.curD] = {filas:[],eventos:[],archivos:[]};
   dateInput.value = ST.curD;
 
-  var dia = ST.sup.dias[ST.curD] || {filas:[],eventos:[]};
+  var dia = ST.sup.dias[ST.curD] || {filas:[],eventos:[],archivos:[]};
   var body=document.getElementById('supBody');
 
   if(!dia.filas || !dia.filas.length){
@@ -832,7 +929,6 @@ function renderSup(){
 
   var html='';
   dia.filas.forEach(function(f,i){
-    // Forzamos cálculo inicial al renderizar por si acaso
     actualizarHHSup(i, false);
     actualizarM3Sup(i, false);
 
@@ -856,7 +952,6 @@ function renderSup(){
   });
   body.innerHTML=html;
 
-  // Event listener dinámico para inputs
   body.querySelectorAll('input[data-i]').forEach(function(inp){
     inp.addEventListener('input', function(){
       var i=parseInt(this.dataset.i,10), k=this.dataset.k;
@@ -880,13 +975,17 @@ function renderSup(){
 
 function parseHoraToDec(v){
   if(v===''||v==null) return 0;
-  // Si es texto con formato HH:MM
-  if(typeof v==='string' && v.indexOf(':')>-1){
-    var p=v.split(':');
-    return (parseInt(p[0],10)||0)+(parseInt(p[1],10)||0)/60;
+  if(typeof v==='number') return v;
+  var str = String(v).toUpperCase().replace('AM','').replace('PM','').trim();
+  if(str.indexOf(':') > -1){
+    var p = str.split(':');
+    var h = parseInt(p[0],10)||0;
+    var m = parseFloat(p[1])||0;
+    if(String(v).toUpperCase().indexOf('PM') > -1 && h < 12) h += 12;
+    if(String(v).toUpperCase().indexOf('AM') > -1 && h === 12) h = 0;
+    return h + m/60;
   }
-  // Sino, intentar parsear como número
-  var num = parseFloat(v);
+  var num = parseFloat(str);
   return isNaN(num) ? 0 : num;
 }
 function decToHHMM(dec){
@@ -907,7 +1006,7 @@ function calcResSup(){
 
   filas.forEach(function(f){
     sumHH += parseHoraToDec(f.hH);
-    sumHM += parseHoraToDec(f.hM);
+    sumHM += parseFloat(f.hM)||0; 
     sumComb += parseFloat(f.comb)||0;
     sumM3   += parseFloat(f.m3)||0;
     sumVuel += parseFloat(f.vuel)||0;
@@ -916,11 +1015,10 @@ function calcResSup(){
   document.getElementById('sW').textContent  = nPers;
   document.getElementById('sHH').textContent = fmt==='hhmm'?decToHHMM(sumHH):sumHH.toFixed(2);
   
-  // Cálculo de Promedio: Total H. Hombre dividido por la cantidad de personal
   var promHH = nPers > 0 ? (sumHH / nPers) : 0;
   document.getElementById('sPH').textContent = fmt==='hhmm'?decToHHMM(promHH):promHH.toFixed(2);
   
-  document.getElementById('sHM').textContent = fmt==='hhmm'?decToHHMM(sumHM):sumHM.toFixed(2);
+  document.getElementById('sHM').textContent = sumHM.toFixed(2);
   document.getElementById('sCB').textContent = sumComb.toFixed(0);
   document.getElementById('sM3').textContent = sumM3.toFixed(0);
 
@@ -1093,15 +1191,24 @@ async function generarExcelPersonal(d, filename){
       if (k === 'fec' && val) {
         var p = String(val).split('-');
         if(p.length===3) val = new Date(p[0], p[1]-1, p[2]);
+        cell.value = val;
       } 
-      else if(k === 'hT' || k === 'hM' || k === 'hI' || k === 'hF') {
-        var dec = parseHoraToDec(val);
-        if(dec > 0) {
-            cell.value = dec / 24;
+      else if(k === 'hT') {
+        var decHT = parseHoraToDec(val);
+        if(decHT > 0) {
+            cell.value = decHT / 24;
+            cell.numFmt = '[h]:mm';
+        } else { cell.value = null; }
+      }
+      else if(k === 'hI' || k === 'hF') { 
+        var decHIF = parseHoraToDec(val);
+        if(decHIF > 0) {
+            cell.value = decHIF / 24;
             cell.numFmt = 'hh:mm';
-        } else {
-            cell.value = null;
-        }
+        } else { cell.value = null; }
+      }
+      else if(k === 'hM') { 
+        cell.value = parseFloat(val) || 0;
       }
       else if(k === 'lit' || k === 'lit2' || k === 'hoI' || k === 'hoF' || k === 'kmI' || k === 'kmF') {
         cell.value = parseFloat(val) || 0;
@@ -1169,85 +1276,65 @@ async function expSupExcel(){
       ws.getCell(CELL_MAP_SUP.tbl.cols.maq + r).value = f.maq || null;
       ws.getCell(CELL_MAP_SUP.tbl.cols.pat + r).value = f.pat || null;
       
-      // H.Maq
-      var decHM = parseHoraToDec(f.hM);
-      if(!isNaN(decHM) && decHM > 0) {
-          var cHM = ws.getCell(CELL_MAP_SUP.tbl.cols.hM + r);
-          cHM.value = decHM / 24;
-          cHM.numFmt = 'hh:mm';
+      var numHM = parseFloat(f.hM);
+      if(!isNaN(numHM)) {
+          ws.getCell(CELL_MAP_SUP.tbl.cols.hM + r).value = numHM || 0;
       } else {
           ws.getCell(CELL_MAP_SUP.tbl.cols.hM + r).value = f.hM || null;
       }
       
       ws.getCell(CELL_MAP_SUP.tbl.cols.comb + r).value = parseFloat(f.comb)||0;
       
-      // H.Inicio
       var decHI = parseHoraToDec(f.hI);
-      if(!isNaN(decHI) && decHI > 0) {
+      if(f.hI) {
           var cHI = ws.getCell(CELL_MAP_SUP.tbl.cols.hI + r);
           cHI.value = decHI / 24;
           cHI.numFmt = 'hh:mm';
-      } else {
-          ws.getCell(CELL_MAP_SUP.tbl.cols.hI + r).value = f.hI || null;
-      }
+      } else { ws.getCell(CELL_MAP_SUP.tbl.cols.hI + r).value = null; }
       
-      // H.Fin
       var decHF = parseHoraToDec(f.hF);
-      if(!isNaN(decHF) && decHF > 0) {
+      if(f.hF) {
           var cHF = ws.getCell(CELL_MAP_SUP.tbl.cols.hF + r);
           cHF.value = decHF / 24;
           cHF.numFmt = 'hh:mm';
-      } else {
-          ws.getCell(CELL_MAP_SUP.tbl.cols.hF + r).value = f.hF || null;
-      }
+      } else { ws.getCell(CELL_MAP_SUP.tbl.cols.hF + r).value = null; }
       
-      // H.Hombre
       var decHH = parseHoraToDec(f.hH);
-      if(!isNaN(decHH) && decHH > 0) {
+      if(f.hH) {
           var cHH = ws.getCell(CELL_MAP_SUP.tbl.cols.hH + r);
           cHH.value = decHH / 24;
-          cHH.numFmt = 'hh:mm';
-      } else {
-          ws.getCell(CELL_MAP_SUP.tbl.cols.hH + r).value = f.hH || null;
-      }
+          cHH.numFmt = '[h]:mm';
+      } else { ws.getCell(CELL_MAP_SUP.tbl.cols.hH + r).value = null; }
       
       ws.getCell(CELL_MAP_SUP.tbl.cols.prodR + r).value = f.prodR || null;
       ws.getCell(CELL_MAP_SUP.tbl.cols.actR + r).value = f.actR || null;
       ws.getCell(CELL_MAP_SUP.tbl.cols.vuel + r).value = parseFloat(f.vuel)||0;
       ws.getCell(CELL_MAP_SUP.tbl.cols.m3 + r).value = parseFloat(f.m3)||0;
 
-      // Acumular para resumen
       sumHH += decHH;
-      sumHM += decHM;
+      sumHM += numHM || 0;
       sumComb += parseFloat(f.comb)||0;
       sumM3   += parseFloat(f.m3)||0;
     });
 
-    // --- EXPORTAR CUADRO RESUMEN ---
     if(CELL_MAP_SUP.res) {
         ws.getCell(CELL_MAP_SUP.res.cantPersonal).value = nPers;
 
-        // Total H. Hombre (formato [h]:mm permite sumar más de 24 horas)
         var cTHH = ws.getCell(CELL_MAP_SUP.res.totalHHombre);
         cTHH.value = sumHH > 0 ? sumHH / 24 : 0;
         cTHH.numFmt = '[h]:mm';
 
-        // Promedio H/Trab
         var promHH = nPers > 0 ? (sumHH / nPers) : 0;
         var cPHT = ws.getCell(CELL_MAP_SUP.res.promHTrab);
         cPHT.value = promHH > 0 ? promHH / 24 : 0;
         cPHT.numFmt = 'hh:mm';
 
-        // Total H. Maquina
-        var cTHM = ws.getCell(CELL_MAP_SUP.res.totalHMaquina);
-        cTHM.value = sumHM > 0 ? sumHM / 24 : 0;
-        cTHM.numFmt = '[h]:mm';
+        ws.getCell(CELL_MAP_SUP.res.totalHMaquina).value = sumHM;
 
         ws.getCell(CELL_MAP_SUP.res.totalComb).value = sumComb;
         ws.getCell(CELL_MAP_SUP.res.totalM3Dia).value = sumM3;
     }
 
-    // --- EXPORTAR EVENTOS O IMPREVISTOS ---
     var eventos = dia.eventos || [];
     eventos.forEach(function(e, i){
       var r = CELL_MAP_SUP.evt.startRow + i;
@@ -1273,7 +1360,6 @@ async function expSupExcel(){
 </script>
 
 
-
 <!-- Service Worker Registration -->
 <script>
 if('serviceWorker' in navigator){
@@ -1284,6 +1370,7 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
+
 
 
 </body>
